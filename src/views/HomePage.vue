@@ -17,7 +17,7 @@ export default {
 </script>
 
 <style>
-.head-bar {
+.home-page {
   display: flex;
   justify-content: space-between;
   align-items: center;

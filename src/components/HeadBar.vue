@@ -3,7 +3,7 @@
         <div class="buttons">
             <button>Кнопка 1</button>
             <button>Кнопка 2</button>
-            <button>Кнопка 3</button>
+            <button>Кнопка 4</button>
         </div>
     </header>
 </template>

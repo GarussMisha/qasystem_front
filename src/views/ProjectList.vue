@@ -2,10 +2,8 @@
 
 <template>
     <header class="project-list">
-        <div class="buttons">
-            <button>Кнопка 1</button>
-            <button>Кнопка 2</button>
-            <button>Кнопка 3</button>
+        <div class="project-text">
+            <h1>Страница отображения всех проектов.</h1>
         </div>
     </header>
 </template>
@@ -26,17 +24,9 @@ export default {
   color: white;
 }
 
-.buttons button {
-  margin-left: 10px;
-  padding: 5px 10px;
-  background-color: #555;
+.h1 {
+  margin: 200px;
   color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
-.buttons button:hover {
-  background-color: #777;
-}
 </style>
