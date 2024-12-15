@@ -9,7 +9,8 @@
       <div class="menu-buttons">
         <button @click="goToInfo" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.4s ease' }">Информация</button>
         <button @click="goToProfile" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.4s ease' }">Профиль</button>
-      </div>
+        <button @click="goToProjectList" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.4s ease' }">Проекты</button>
+    </div>
     </div>
   </template>
   
@@ -31,7 +32,10 @@
       },
       goToProfile() {
         this.$router.push({ name: 'ProfilePage' });
-      }
+      },
+      goToProjectList() {
+        this.$router.push({ name: 'ProjectList' });
+      },
     }
   };
   </script>
