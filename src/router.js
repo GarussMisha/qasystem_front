@@ -4,6 +4,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomePage from '@/views/HomePage.vue';
 import ProjectList from '@/views/ProjectList.vue';
 import ProjectDetail from '@/views/ProjectDetail.vue';
+import InfoPage from "./views/InfoPage.vue";
+import ProfilePage from "./views/ProfilePage.vue";
 
 // Определяем паршруты
 const routes = [
@@ -21,6 +23,16 @@ const routes = [
         path: '/projects/:id',
         name: 'ProjectDetail',
         component: ProjectDetail,
+    },
+    {
+        path: '/info',
+        name: 'InfoPage',
+        component: InfoPage,
+    },
+    {
+        path: '/profile',
+        name: 'ProfilePage',
+        component: ProfilePage,
     },
 ];
 

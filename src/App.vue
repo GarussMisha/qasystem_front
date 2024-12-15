@@ -17,13 +17,23 @@ export default {
 </script>
 
 <style>
-body, html {
-  margin: 0; /* Убираем отступы по умолчанию для body и html */
-  padding: 0; /* Убираем отступы по умолчанию для body и html */
+/* Подключение шрифта через Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+
+/* Убираем отступы в проекте. */
+body, html { 
+  margin: 0; 
+  padding: 0;
+  font-family: 'Roboto', sans-serif; /* Устанавливаем шрифт по умолчанию */
+  font-weight: 700;
 }
 
+
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Roboto', sans-serif;
+ 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2165aa;

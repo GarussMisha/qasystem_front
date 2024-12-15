@@ -1,11 +1,11 @@
 <template>
   <header class="head-bar">
     <div class="left-buttons">
-      <button>Logo</button>
+      <button @click="goToHome">Logo</button>
     </div>
     <div class="right-buttons">
-      <button>Информация</button>
-      <button>Профиль</button>
+      <button @click="goToInfo">Информация</button>
+      <button @click="goToProfile">Профиль</button>
     </div>
   </header>
 </template>
@@ -13,6 +13,17 @@
 <script>
 export default {
   name: 'HeadBar',
+  methods: {
+    goToInfo() {
+        this.$router.push({ name: 'InfoPage'})
+    },
+    goToHome() {
+        this.$router.push({ name: 'Home'})
+    },
+    goToProfile() {
+        this.$router.push({ name: 'ProfilePage'})
+    }
+  }
 };
 </script>
 
@@ -26,41 +37,23 @@ export default {
   color: white;
 }
 
-.left-buttons button {
+/* Общий селектор для всех кнопок внутри HeadBar */
+.head-bar button {
   margin-right: 10px;
-  padding: 5px 10px;
-  color: rgb(10, 0, 90);
-  background-color: #ffffff;
-  border-radius: 10px;
-  cursor: pointer;
-  padding: 5px 10px;
-}
-
-.right-buttons button {
   margin-left: 10px;
   padding: 5px 10px;
   color: rgb(10, 0, 90);
   background-color: #ffffff;
-  border-radius: 10px;
-  cursor: pointer;
-  padding: 5px 10px;
-}
-
-.buttons button { /* Исправленный селектор */
-  margin-left: 10px;
-  padding: 5px 10px;
-  background-color: #c20c0c;
-  color: rgb(110, 9, 9);
+  border-radius: 7px;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
+
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
 }
 
-.left-buttons button:hover { 
+.head-bar button:hover {
     background-color: #e3e3e3;
-}
-
-.right-buttons button:hover { 
-  background-color: #e3e3e3;
 }
 </style>
