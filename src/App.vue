@@ -1,17 +1,20 @@
 <template>
   <div id="app">
     <HeadBar />
+    <SideMenu />
     <router-view />
   </div>
 </template>
 
 <script>
 import HeadBar from '@/components/HeadBar.vue';
+import SideMenu from '@/components/SideMenu.vue'
 
 export default {
   name: 'App',
   components: {
     HeadBar, // Регестрируем HeadBar
+    SideMenu, // Регестрируем SideMenu
   },
 };
 </script>
@@ -33,7 +36,6 @@ body, html {
 
 #app {
   font-family: 'Roboto', sans-serif;
- 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2165aa;

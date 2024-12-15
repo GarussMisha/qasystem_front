@@ -4,6 +4,7 @@
     <header class="home-page">
         <div class="home">
             <h1>Главная страница</h1>
+            <p>Информация о новых обновлениях и новости портала</p>
         </div>
     </header>
 </template>

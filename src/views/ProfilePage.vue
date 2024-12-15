@@ -4,6 +4,7 @@
     <header class="profil-page">
         <div class="profil">
             <h1>Страница профиля</h1>
+            <p>На этой странице находится информация о профиле пользователя</p>
         </div>
     </header>
 </template>

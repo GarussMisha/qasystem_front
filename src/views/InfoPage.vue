@@ -4,6 +4,7 @@
     <header class="info-page">
         <div class="info">
             <h1>Страница с информацией</h1>
+            <p>Информация как пользоватся порталом и примеры использования</p>
         </div>
     </header>
 </template>
