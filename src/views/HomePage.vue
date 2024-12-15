@@ -2,10 +2,8 @@
 
 <template>
     <header class="home-page">
-        <div class="buttons">
-            <button>Кнопка 1</button>
-            <button>Кнопка 2</button>
-            <button>Кнопка 3</button>
+        <div class="home">
+            <h1>Главная страница</h1>
         </div>
     </header>
 </template>
@@ -16,27 +14,14 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .home-page {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  background-color: #333;
+  background-color: #9e9e9e;
   color: white;
 }
 
-.buttons button {
-  margin-left: 10px;
-  padding: 5px 10px;
-  background-color: #555;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.buttons button:hover {
-  background-color: #777;
-}
 </style>

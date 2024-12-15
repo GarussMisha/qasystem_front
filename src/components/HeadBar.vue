@@ -1,40 +1,66 @@
 <template>
-    <header class="head-bar">
-        <div class="buttons">
-            <button>Кнопка 1</button>
-            <button>Кнопка 2</button>
-            <button>Кнопка 4</button>
-        </div>
-    </header>
+  <header class="head-bar">
+    <div class="left-buttons">
+      <button>Logo</button>
+    </div>
+    <div class="right-buttons">
+      <button>Информация</button>
+      <button>Профиль</button>
+    </div>
+  </header>
 </template>
 
 <script>
 export default {
-    name: 'HeadBar',
+  name: 'HeadBar',
 };
 </script>
 
-<style>
+<style scoped>
 .head-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  background-color: #333;
+  background-color: #23005a;
   color: white;
 }
 
-.buttons button {
+.left-buttons button {
+  margin-right: 10px;
+  padding: 5px 10px;
+  color: rgb(10, 0, 90);
+  background-color: #ffffff;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+.right-buttons button {
   margin-left: 10px;
   padding: 5px 10px;
-  background-color: #555;
-  color: white;
+  color: rgb(10, 0, 90);
+  background-color: #ffffff;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+.buttons button { /* Исправленный селектор */
+  margin-left: 10px;
+  padding: 5px 10px;
+  background-color: #c20c0c;
+  color: rgb(110, 9, 9);
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
 
-.buttons button:hover {
-  background-color: #777;
+.left-buttons button:hover { 
+    background-color: #e3e3e3;
+}
+
+.right-buttons button:hover { 
+  background-color: #e3e3e3;
 }
 </style>

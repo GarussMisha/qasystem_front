@@ -14,7 +14,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .head-bar {
   display: flex;
   justify-content: space-between;
@@ -28,5 +28,4 @@ export default {
   margin: 200px;
   color: white;
 }
-
 </style>

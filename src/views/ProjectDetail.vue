@@ -16,7 +16,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .head-bar {
   display: flex;
   justify-content: space-between;
@@ -26,17 +26,4 @@ export default {
   color: white;
 }
 
-.buttons button {
-  margin-left: 10px;
-  padding: 5px 10px;
-  background-color: #555;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.buttons button:hover {
-  background-color: #777;
-}
 </style>
