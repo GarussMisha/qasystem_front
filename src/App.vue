@@ -1,8 +1,10 @@
 <template>
   <div id="app">
     <HeadBar />
-    <SideMenu />
-    <router-view />
+    <SideMenu @toggle="handleSideMenuToggle" />
+    <div class="content" :style="{ marginLeft: contentMargiLeft }">
+      <router-view />
+    </div>
   </div>
 </template>
 
@@ -16,6 +18,21 @@ export default {
     HeadBar, // Регестрируем HeadBar
     SideMenu, // Регестрируем SideMenu
   },
+  data() {
+    return {
+      isSideMenuExpanded: false
+    };
+  },
+  computed: {
+    contentMargiLeft() {
+      return this.isSideMenuExpanded ? '200px' : '50px';
+    }
+  },
+  methods: {
+    handleSideMenuToggle(isExpanded) {
+      this.isSideMenuExpanded = isExpanded;
+    }
+  }
 };
 </script>
 
@@ -39,5 +56,9 @@ body, html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2165aa;
+}
+
+.content {
+  transition: margin-left 0.5s ease; /* Плавное изменение отступа от SideMenu*/
 }
 </style>

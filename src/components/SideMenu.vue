@@ -24,6 +24,7 @@
     methods: {
       toggleMenu() {
         this.isExpanded = !this.isExpanded;
+        this.$emit('toggle', this.isExpanded);
       },
       goToInfo() {
         this.$router.push({ name: 'InfoPage' });
@@ -43,11 +44,12 @@
     left: 0;
     height: calc(100vh - 60px); /* Высота меню минус высота HeadBar */
     width: 50px; /* Свернутое состояние: ширина 50px */
-    background-color: #23005a;
+    background-color: #ffffff;
     color: white;
     transition: width 0.5s ease; /* Плавное изменение ширины */
     overflow: hidden; /* Скрываем содержимое, если меню свернуто */
     z-index: 1; /* Убедитесь, что меню находится поверх других элементов */
+    border-right: 0.6px solid #23005a; /* Цвет и толщина полосы */
   }
   
   /* Раскрытое состояние меню */
@@ -62,7 +64,7 @@
     right: 10px;
     background-color: transparent;
     border: none;
-    color: white;
+    color: rgb(0, 0, 0);
     font-size: 20px;
     cursor: pointer;
     z-index: 1001; /* Убедитесь, что кнопка находится поверх меню */
