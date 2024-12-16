@@ -1,5 +1,4 @@
 // Заглушка
-
 <template>
     <header class="project-list">
         <div class="project-text">
@@ -11,7 +10,7 @@
         <div v-else>
           <ul>
             <li v-for="project in projects" :key="project.id">
-              {{ project.name }}
+              <strong>ID:</strong> {{ project.id }} | <strong>Название:</strong> {{ project.projectName }}
             </li>
           </ul>
         </div>

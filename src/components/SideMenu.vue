@@ -2,7 +2,8 @@
     <div class="side-menu" :class="{ 'side-menu-expanded': isExpanded }">
       <!-- Кнопка для раскрытия/скрытия меню -->
       <button class="toggle-button" @click="toggleMenu">
-        {{ isExpanded ? '<<' : '>>' }}
+        <span class="text-collapsed" :style="{ opacity: isExpanded ? 0 : 1, transition: 'opacity 0.2s ease' }">>></span>
+        <span class="text-expanded" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.2s ease' }"><<</span>
       </button>
   
       <!-- Кнопки меню -->
@@ -10,7 +11,7 @@
         <button @click="goToInfo" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.4s ease' }">Информация</button>
         <button @click="goToProfile" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.4s ease' }">Профиль</button>
         <button @click="goToProjectList" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.4s ease' }">Проекты</button>
-    </div>
+      </div>
     </div>
   </template>
   
@@ -81,6 +82,7 @@
     align-items: flex-start;
     margin-top: 50px;
     padding: 10px;
+    
   }
   
   .menu-buttons button {
@@ -101,4 +103,13 @@
   .menu-buttons button:hover {
     background-color: #e3e3e3;
   }
-  </style>
+
+/* Анимация для текста кнопки */
+.text-collapsed,
+.text-expanded {
+  position: absolute;
+  top: 15px;
+  left: 10%;
+  transform: translate(-50%, -50%);
+}
+</style>
