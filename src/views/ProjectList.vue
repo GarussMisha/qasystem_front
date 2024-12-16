@@ -8,14 +8,27 @@
     <div v-else-if="error" class="error-message">{{ error }}</div>
     <div v-else>
       <button @click="showModal = true" class="create-project-button">Создать проект</button>
-      <ul>
-        <li v-for="project in projects" :key="project.id">
-          <strong>ID:</strong> {{ project.id }} | <strong>Название:</strong> {{ project.projectName }}
-        </li>
-      </ul>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="project in projects" :key="project.id">
+              <td>{{ project.id }}</td>
+              <td :title="project.projectName">{{ truncateText(project.projectName, 30) }}</td>
+              <td :title="project.projectDescription">{{ truncateText(project.projectDescription, 30) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Модальное окно -->
+      <CreateProjectModal v-if="showModal" @close="showModal = false" @create="handleCreateProject" />
     </div>
-    <!-- Модальное окно -->
-    <CreateProjectModal v-if="showModal" @close="showModal = false" @create="handleCreateProject" />
   </header>
 </template>
 
@@ -46,6 +59,16 @@ export default {
     },
   },
   methods: {
+    truncateText(text, length) {
+      if (text.length > length) {
+        let truncated = text.substr(0, length);
+        if (truncated.lastIndexOf(' ') > 0) {
+          truncated = truncated.substr(0, truncated.lastIndexOf(' '));
+        }
+        return truncated + '...';
+      }
+      return text;
+    },
     // Метод для загрузки проектов
     async fetchProjects() {
       await this.projectStore.fetchProjects();
@@ -78,27 +101,6 @@ export default {
   font-size: 14px;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  background-color: #fff;
-  color: #333;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 4px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 300px; /* Устанавливаем ширину для списка */
-}
-
-li strong {
-  margin-right: 5px; /* Добавляем отступ между текстом и ID/названием */
-}
-
 .create-project-button {
   background-color: #28a745;
   color: white;
@@ -111,5 +113,40 @@ li strong {
 
 .create-project-button:hover {
   background-color: #218838;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: rgb(255, 255, 255);
+  color: #000000;
+  box-shadow: 2 20px 50px rgb(255, 255, 255);
+}
+
+th {
+  padding: 5px;
+  text-align: left;
+  background-color: #23005a;
+  color: white;
+  font-weight: bold;
+}
+
+th:hover {
+  background-color: #2e0077;
+}
+
+td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #000000;
+}
+
+tr:hover {
+  background-color: #e9e9e9;
 }
 </style>
