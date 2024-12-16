@@ -25,7 +25,7 @@ export default {
   },
   computed: {
     contentMargiLeft() {
-      return this.isSideMenuExpanded ? '200px' : '50px';
+      return this.isSideMenuExpanded ? '200px' : '40px';
     }
   },
   methods: {
@@ -49,7 +49,9 @@ body, html {
   font-weight: 700;
 }
 
-
+:root {
+  --header-height: 60px; /* Высота HeadBar */
+}
 
 #app {
   font-family: 'Roboto', sans-serif;
@@ -60,5 +62,6 @@ body, html {
 
 .content {
   transition: margin-left 0.5s ease; /* Плавное изменение отступа от SideMenu*/
+  padding-top: var(--header-height); /* Добавляем отступ сверху */
 }
 </style>

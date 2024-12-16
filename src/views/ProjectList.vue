@@ -18,7 +18,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="project in projects" :key="project.id">
+            <tr v-for="project in projects" :key="project.id" @click="goToProjectDetail(project.id)">
               <td>{{ project.id }}</td>
               <td :title="project.projectName">{{ truncateText(project.projectName, 30) }}</td>
               <td :title="project.projectDescription">{{ truncateText(project.projectDescription, 30) }}</td>
@@ -77,6 +77,10 @@ export default {
     async handleCreateProject(projectData) {
       await this.projectStore.addProject(projectData);
       this.showModal = false; // Закрываем модальное окно
+    },
+    goToProjectDetail(projectId) {
+      console.log({projectId})
+      this.$router.push({ name: 'ProjectDetail', params: { id: projectId}});
     },
   },
   async created() {
@@ -144,6 +148,10 @@ td {
   padding: 10px;
   text-align: left;
   border-bottom: 1px solid #000000;
+}
+
+tr {
+  cursor: pointer; /* Делаем курсор рукой при наведении */
 }
 
 tr:hover {

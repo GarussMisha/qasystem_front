@@ -29,6 +29,10 @@ export default {
 
 <style scoped>
 .head-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 40px;
   display: flex;
   justify-content: space-between;

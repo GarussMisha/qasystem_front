@@ -2,8 +2,8 @@
     <div class="side-menu" :class="{ 'side-menu-expanded': isExpanded }">
       <!-- Кнопка для раскрытия/скрытия меню -->
       <button class="toggle-button" @click="toggleMenu">
-        <span class="text-collapsed" :style="{ opacity: isExpanded ? 0 : 1, transition: 'opacity 0.2s ease' }">>></span>
-        <span class="text-expanded" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.2s ease' }"><<</span>
+        <span class="text-collapsed" :style="{ opacity: isExpanded ? 0 : 1, transition: 'opacity 0.2s ease' }">|||</span>
+        <span class="text-expanded" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.2s ease' }">|||</span>
       </button>
   
       <!-- Кнопки меню -->
@@ -44,11 +44,12 @@
   <style scoped>
   /* Основной стиль меню */
   .side-menu {
+
     position: fixed;
-    top: 60spx; /* Отступ от HeadBar */
+    top: 60px; /* Отступ от HeadBar */
     left: 0;
     height: calc(100vh - 60px); /* Высота меню минус высота HeadBar */
-    width: 50px; /* Свернутое состояние: ширина 50px */
+    width: 40px; /* Свернутое состояние: ширина 50px */
     background-color: #ffffff;
     color: white;
     transition: width 0.5s ease; /* Плавное изменение ширины */
@@ -100,7 +101,7 @@
     text-align: left;
   }
   
-  .menu-buttons button:hover {
+.menu-buttons button:hover {
     background-color: #e3e3e3;
   }
 
