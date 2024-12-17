@@ -1,17 +1,24 @@
 <template>
-    <header class="path-bar">
-      <div class="path-text">
-        <p>Строка с открытым путем пример профиль > проект > тесткейс</p>
-      </div>
-    </header>
+  <header class="path-bar">
+    <div class="path-text">
+      <p>{{ path }}</p>
+    </div>
+  </header>
 </template>
-  
+
 <script>
-  export default {
-    name: 'PathBar',
-  };
+//import { useProjectStore } from '@/stores/projectStore'; // Импортируем хранилище проектов
+
+export default {
+  name: 'PathBar',
+  data() {
+    return {
+      path: '', // Здесь будет храниться текущий путь
+    };
+  },
+};
 </script>
-  
+
 <style scoped>
 .path-bar {
   display: flex;
@@ -20,5 +27,5 @@
   padding: 5px 20px;
   background-color: #dddddd;
   color: rgb(0, 0, 0);
-  }
+}
 </style>

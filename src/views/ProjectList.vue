@@ -7,7 +7,8 @@
     <div v-if="loading">Загрузка проектов...</div>
     <div v-else-if="error" class="error-message">{{ error }}</div>
     <div v-else>
-      <button @click="showModal = true" class="create-project-button">Создать проект</button>
+      <button @click="showCreateProjectModal = true" class="create-project-button">Создать проект</button>
+      <button @click="showDeleteProjectModal = true" class="delete-project-button">Удалить проект</button>
       <div class="table-container">
         <table>
           <thead>
@@ -27,7 +28,8 @@
         </table>
       </div>
       <!-- Модальное окно -->
-      <CreateProjectModal v-if="showModal" @close="showModal = false" @create="handleCreateProject" />
+      <CreateProjectModal v-if="showCreateProjectModal" @close="showCreateProjectModal = false" @create="handleCreateProject" />
+      <DeleteProjectModal v-if="showDeleteProjectModal" @delete="handleDeleteProject" @close="showDeleteProjectModal = false" />
     </div>
   </header>
 </template>
@@ -35,16 +37,19 @@
 <script>
 import { useProjectStore } from '@/stores/projectStore'; // Импортируем хранилище
 import CreateProjectModal from '@/components/CreateProjectModal.vue'; // Импортируем модальное окно
+import DeleteProjectModal from '@/components/DeleteProjectModal.vue';
 
 export default {
   name: 'ProjectList',
   components: {
     CreateProjectModal, // Регистрируем модальное окно
+    DeleteProjectModal,
   },
   data() {
     return {
       projectStore: useProjectStore(), // Инициализируем хранилище
-      showModal: false, // Флаг для отображения модального окна
+      showCreateProjectModal: false, // Флаг для отображения модального окна
+      showDeleteProjectModal: false,
     };
   },
   computed: {
@@ -76,7 +81,12 @@ export default {
     // Метод для создания проекта
     async handleCreateProject(projectData) {
       await this.projectStore.addProject(projectData);
-      this.showModal = false; // Закрываем модальное окно
+      this.showCreateProjectModal = false; // Закрываем модальное окно
+    },
+    async handleDeleteProject(projectId) {
+      console.log('Deleting project with ID:', projectId); // Логируем id проекта, который нужно удалить
+      await this.projectStore.deleteProject(projectId); // Удаляем проект из хранилища
+      this.showDeleteProjectModal = false; // Закрываем модальное окно
     },
     goToProjectDetail(projectId) {
       console.log({projectId})
@@ -115,8 +125,22 @@ export default {
   margin-bottom: 20px;
 }
 
+.delete-project-button{
+  background-color: #a72828;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 30px;
+}
+
 .create-project-button:hover {
   background-color: #218838;
+}
+
+.delete-project-button:hover {
+  background-color: #831e1e
 }
 
 .table-container {
