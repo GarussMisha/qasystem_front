@@ -1,8 +1,10 @@
 <template>
   <div id="app">
     <HeadBar />
+    
     <SideMenu @toggle="handleSideMenuToggle" />
     <div class="content" :style="{ marginLeft: contentMargiLeft }">
+      <PathBar />
       <router-view />
     </div>
   </div>
@@ -10,13 +12,15 @@
 
 <script>
 import HeadBar from '@/components/HeadBar.vue';
-import SideMenu from '@/components/SideMenu.vue'
+import SideMenu from '@/components/SideMenu.vue';
+import PathBar from '@/components/PathBar.vue';
 
 export default {
   name: 'App',
   components: {
     HeadBar, // Регестрируем HeadBar
     SideMenu, // Регестрируем SideMenu
+    PathBar,
   },
   data() {
     return {
@@ -64,4 +68,7 @@ body, html {
   transition: margin-left 0.5s ease; /* Плавное изменение отступа от SideMenu*/
   padding-top: var(--header-height); /* Добавляем отступ сверху */
 }
+
+
+
 </style>
