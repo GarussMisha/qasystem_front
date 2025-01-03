@@ -5,8 +5,8 @@
       <div class="form-group">
         <label for="projectSelect">Выберите проект:</label>
         <select id="projectSelect" v-model="selectedProjectId" required>
-          <option value="" disabled selected>Выберите проект</option>
-          <option v-for="project in projects" :key="project.id" :value="project.id">
+          <option value="" disabled>Выберите проект</option>
+          <option v-for="project in projectsList" :key="project.id" :value="project.id">
             {{ project.projectName }}
           </option>
         </select>
@@ -21,7 +21,8 @@
 </template>
 
 <script>
-import { useProjectStore } from '@/stores/projectStore'; // Импортируем хранилище проектов
+import { computed } from 'vue';
+import { useProjectStore } from '@/stores/AllProjectStore'; // Импортируем хранилище проектов
 
 export default {
   name: 'DeleteProjectModal',
@@ -30,18 +31,25 @@ export default {
       selectedProjectId: '', // Инициализируем свойство
     };
   },
-  computed: {
-    projects() {
-      const projectStore = useProjectStore();
-      return projectStore.projects; // Получаем список проектов из хранилища
-    },
+  setup() {
+    const projectStore = useProjectStore();
+
+    // Создаем реактивный список проектов
+    const projectsList = computed(() => Object.values(projectStore.projects));
+
+    // Метод для получения имени проекта
+    const getProjectNameById = (projectId) => {
+      const project = projectStore.projects[projectId];
+      return project ? project.projectName : 'Неизвестный проект';
+    };
+
+    return {
+      projectsList,
+      getProjectNameById,
+      projectStore, // Если нужно явно вызывать действия
+    };
   },
   methods: {
-    getProjectNameById(projectId) {
-      const projectStore = useProjectStore();
-      const project = projectStore.projects.find(project => project.id === projectId);
-      return project ? project.projectName : 'Неизвестный проект';
-    },
     confirmDelete() {
       if (this.selectedProjectId) {
         console.log('Deleting project with ID:', this.selectedProjectId); // Логируем id проекта, который нужно удалить

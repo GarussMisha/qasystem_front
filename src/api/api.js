@@ -78,8 +78,11 @@ const getTestCaseById = async (id) => {
 
 // 7. Создание тест-кейса в проекте
 const createTestCaseInProject = async (projectId, testCaseData) => {
+  console.log('Вхов в метод createTestCaseInProject')
+  console.log(testCaseData)
   try {
     const response = await apiClient.post(`/project/${projectId}/testcase`, testCaseData);
+    console.log('api - createTestCaseInProject - ' + response.data)
     return response.data;
   } catch (error) {
     console.error(`Error createTestCaseInProject: Failed to create test case in project with id ${projectId}.`, error);

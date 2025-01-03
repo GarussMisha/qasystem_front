@@ -26,6 +26,7 @@
             </tr>
           </tbody>
         </table>
+        <p>{{ returnData() }}</p>
       </div>
       <!-- Модальное окно -->
       <CreateProjectModal v-if="showCreateProjectModal" @close="showCreateProjectModal = false" @create="handleCreateProject" />
@@ -35,7 +36,7 @@
 </template>
 
 <script>
-import { useProjectStore } from '@/stores/projectStore'; // Импортируем хранилище
+import { useProjectStore } from '@/stores/AllProjectStore'; // Импортируем хранилище
 import CreateProjectModal from '@/components/CreateProjectModal.vue'; // Импортируем модальное окно
 import DeleteProjectModal from '@/components/DeleteProjectModal.vue';
 
@@ -64,6 +65,9 @@ export default {
     },
   },
   methods: {
+    returnData() {
+      console.log(this.projectStore.projects)
+    },
     truncateText(text, length) {
       if (text.length > length) {
         let truncated = text.substr(0, length);
@@ -76,7 +80,7 @@ export default {
     },
     // Метод для загрузки проектов
     async fetchProjects() {
-      await this.projectStore.fetchProjects();
+      await this.projectStore.loadProjects();
     },
     // Метод для создания проекта
     async handleCreateProject(projectData) {
@@ -85,7 +89,7 @@ export default {
     },
     async handleDeleteProject(projectId) {
       console.log('Deleting project with ID:', projectId); // Логируем id проекта, который нужно удалить
-      await this.projectStore.deleteProject(projectId); // Удаляем проект из хранилища
+      await this.projectStore.removeProjectById(projectId); // Удаляем проект из хранилища
       this.showDeleteProjectModal = false; // Закрываем модальное окно
     },
     goToProjectDetail(projectId) {
