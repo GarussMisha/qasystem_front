@@ -1,20 +1,36 @@
 <template>
   <div class="modal-overlay" @mousedown.self="closeModal">
     <div class="modal-content" @click.stop>
-      <h2>Удалить проект</h2>
-      <div class="form-group">
-        <label for="projectSelect">Выберите проект:</label>
-        <select id="projectSelect" v-model="selectedProjectId" required>
-          <option value="" disabled>Выберите проект</option>
-          <option v-for="project in projectsList" :key="project.id" :value="project.id">
-            {{ project.projectName }}
+      <h2>Удалить тест-кейс</h2>
+      <div v-if="testCasesList.length > 0" class="form-group">
+        <label for="testCaseSelect">Выберите тест-кейс:</label>
+        <select id="testCaseSelect" v-model="selectedTestCaseId" required>
+          <option value="" disabled>Выберите тест-кейс</option>
+          <option
+            v-for="testCase in testCasesList"
+            :key="testCase.id"
+            :value="testCase.id"
+          >
+            {{ testCase.testcaseName }}
           </option>
         </select>
+        <p>Вы уверены, что хотите удалить тест-кейс?</p>
       </div>
-      <p v-if="selectedProjectId">Вы уверены, что хотите удалить проект "{{ getProjectNameById(selectedProjectId) }}"?</p>
+      <div v-else>
+        <p>Тест-кейсы отсутствуют для текущего проекта.</p>
+      </div>
       <div class="button-group">
-        <button type="button" @click="confirmDelete" class="delete-button" :disabled="!selectedProjectId">Удалить</button>
-        <button type="button" @click="closeModal" class="cancel-button">Отмена</button>
+        <button
+          type="button"
+          @click="confirmDelete"
+          class="delete-button"
+          :disabled="!selectedTestCaseId"
+        >
+          Удалить
+        </button>
+        <button type="button" @click="closeModal" class="cancel-button">
+          Отмена
+        </button>
       </div>
     </div>
   </div>
@@ -22,46 +38,53 @@
 
 <script>
 import { computed } from 'vue';
-import { useProjectStore } from '@/stores/ProjectStore'
+import { useProjectDataStore } from '@/stores/ProjectDataStore';
 
 export default {
-  name: 'DeleteProjectModal',
+  name: 'DeleteTestCaseModal',
+  props: {
+    projectId: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
-      selectedProjectId: '', // Инициализируем свойство
+      selectedTestCaseId: '', // ID выбранного тест-кейса
     };
   },
-  setup() {
-    const projectStore = useProjectStore();
+  setup(props) {
+    const projectDataStore = useProjectDataStore();
 
-    // Создаем реактивный список проектов
-    const projectsList = computed(() => Object.values(projectStore.projects));
-
-    // Метод для получения имени проекта
-    const getProjectNameById = (projectId) => {
-      const project = projectStore.projects[projectId];
-      return project ? project.projectName : 'Неизвестный проект';
-    };
+    // Получаем список тест-кейсов для проекта
+    const testCasesList = computed(() => {
+      const testCases = projectDataStore.testCasesByProject[props.projectId];
+      console.log('Тест-кейсы для проекта:', testCases);
+      if (!testCases) {
+        console.warn(`Тест-кейсы для проекта с ID ${props.projectId} отсутствуют.`);
+        return [];
+      }
+      return testCases;
+    });
 
     return {
-      projectsList,
-      getProjectNameById,
-      projectStore, // Если нужно явно вызывать действия
+      testCasesList,
     };
   },
   methods: {
     confirmDelete() {
-      if (this.selectedProjectId) {
-        console.log('Deleting project with ID:', this.selectedProjectId); // Логируем id проекта, который нужно удалить
-        this.$emit('delete', this.selectedProjectId); // Отправляем id выбранного проекта в родительский компонент
+      if (this.selectedTestCaseId) {
+        console.log('Удаление тест-кейса с ID:', this.selectedTestCaseId);
+        this.$emit('delete', this.selectedTestCaseId);
       }
     },
     closeModal() {
-      this.$emit('close'); // Закрываем модальное окно
+      this.$emit('close');
     },
   },
 };
 </script>
+
 
 <style scoped>
 .modal-overlay {

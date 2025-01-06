@@ -1,11 +1,11 @@
 import { defineStore } from "pinia";
 import { 
-    getAllProjects,
-    createProject,
-    getProjectById,
-    deleteProjectById,
-    updateProjectById,
- } from '@/api/api';
+        getAllProjects,
+        createProject,
+        getProjectById,
+        deleteProjectById,
+        updateProjectById,
+        } from '@/api/api';
 
 export const useProjectStore = defineStore('projectsStore', {
     state: () => ({
@@ -16,7 +16,9 @@ export const useProjectStore = defineStore('projectsStore', {
     
     getters: {
         allProjects: (state) => Object.values(state.projects), // Вернёт массив всех проектов
+
         projectCount: (state) => Object.keys(state.projects).length, // Вернёт количество проектов
+        
         getProjectById: (state) => (projectId) => {
             return state.projects[projectId]; // Получить проект по ID (пригодится, если хотим брать данные из state без запроса)
           },

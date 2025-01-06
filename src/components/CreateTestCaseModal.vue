@@ -1,5 +1,5 @@
 <template>
-  <div class="modal-overlay" @click="$emit('close')">
+  <div class="modal-overlay" @mousedown.self="$emit('close')">
     <div class="modal-content" @click.stop>
       <h2>Создать тест-кейс</h2>
       <form @submit.prevent="submitForm">
@@ -54,6 +54,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  user-select: none;
 }
 
 .modal-content {
@@ -122,5 +123,18 @@ export default {
 
 .cancel-button:hover {
   background-color: #c82333;
+}
+
+textarea {
+  width: 100%; /* Ширина фиксированная или относительная */
+  resize: vertical; /* Разрешаем только изменение высоты */
+  max-height: 300px; /* Максимальная высота */
+  min-height: 100px; /* Минимальная высота */
+  overflow: auto; /* Добавляем прокрутку, если содержимое превышает максимальную высоту */
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style>

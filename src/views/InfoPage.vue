@@ -39,51 +39,57 @@
   </script>
   
   <style scoped>
+  /* Общий стиль страницы */
   .info-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 20px;
-    background-color: #f0f0f0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
     color: #333;
-    font-family: Arial, sans-serif;
   }
   
+  /* Блок с общей информацией */
   .info {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    text-align: left; /* Выровнять текст по левому краю */
     margin-bottom: 20px;
     padding: 20px;
-    background-color: #6200ea;
-    color: #fff;
-    border-radius: 10px;
+    background-color: #292961; /* Темно-синий фон */
+    color: white;
+    border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   
   .info h1 {
-    font-size: 2rem;
+    font-size: 24px;
     font-weight: bold;
     margin: 0;
   }
   
   .info p {
-    font-size: 1.2rem;
+    font-size: 16px;
     margin-top: 10px;
+    color: #d0d0ff; /* Светлый текст */
   }
   
+  /* Блок с руководством */
   .guide {
     width: 100%;
     max-width: 800px;
-    background-color: #fff;
+    background-color: white;
     color: #333;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   
   .guide h2 {
-    font-size: 1.5rem;
+    font-size: 20px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    color: #292961;
   }
   
   .guide ul {
@@ -93,13 +99,23 @@
   
   .guide li {
     margin-bottom: 15px;
-    font-size: 1rem;
+    font-size: 14px;
     line-height: 1.5;
+    position: relative;
+    padding-left: 20px;
+  }
+  
+  .guide li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #6200ea; /* Акцентный цвет */
+    font-size: 20px;
+    line-height: 1;
   }
   
   .guide li strong {
     font-weight: bold;
-    color: #6200ea;
+    color: #292961; /* Темно-синий акцент */
   }
   </style>
-  

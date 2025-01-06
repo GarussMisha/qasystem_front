@@ -1,18 +1,19 @@
 import { defineStore } from 'pinia';
 import {
-  // Методы для тест-кейсов:
-  getAllTestCases,
-  getTestCaseById,
-  createTestCaseInProject,
-  getAllTestCaseByProjectId,
-  updateTestCaseById,
-  
-  // TODO: методы для будущих объектов (чек-листы, статусы и др.)
-  // createChecklistInProject,
-  // getChecklistByProjectId,
-  // updateChecklist,
-  // ...
-} from '@/api/api';
+        // Методы для тест-кейсов:
+        getAllTestCases,
+        getTestCaseById,
+        createTestCaseInProject,
+        getAllTestCaseByProjectId,
+        updateTestCaseById,
+        deleteTestCaseById,
+        
+        // TODO: методы для будущих объектов (чек-листы, статусы и др.)
+        // createChecklistInProject,
+        // getChecklistByProjectId,
+        // updateChecklist,
+        // ...
+      } from '@/api/api';
 
 export const useProjectDataStore = defineStore('projectDataStore', {
     state: () => ({
@@ -20,14 +21,10 @@ export const useProjectDataStore = defineStore('projectDataStore', {
       // Например, объект вида { [projectId]: [testCase1, testCase2, ...] }:
       testCasesByProject: {},
       allTestCases: [],
-  
-      // Если нужен глобальный список всех тест-кейсов (не только по проектам):
-      // testCases: [],
-  
+
       // В будущем можно добавить другие коллекции (чек-листы, статусы, шаги):
       // checklistsByProject: {},
       // stepsByTestCase: {},
-  
       loading: false,
       error: null,
     }),
@@ -59,13 +56,13 @@ export const useProjectDataStore = defineStore('projectDataStore', {
             this.loading = true;
             this.error = null;
             try {
-            const allTestCases = await getAllTestCases();
-            this.allTestCases = allTestCases;
+              const allTestCases = await getAllTestCases();
+              this.allTestCases = allTestCases;
             } catch (error) {
-            this.error = error.message;
-            console.error('TestDataStore - loadAllTestCases error:', error);
+              this.error = error.message;
+              console.error('TestDataStore - loadAllTestCases error:', error);
             } finally {
-            this.loading = false;
+              this.loading = false;
             }
         },
     
@@ -76,13 +73,13 @@ export const useProjectDataStore = defineStore('projectDataStore', {
             this.loading = true;
             this.error = null;
             try {
-            const testCases = await getAllTestCaseByProjectId(projectId);
-            this.testCasesByProject[projectId] = testCases;
+              const testCases = await getAllTestCaseByProjectId(projectId);
+              this.testCasesByProject[projectId] = testCases;
             } catch (error) {
-            this.error = error.message;
-            console.error(`TestDataStore - loadTestCasesByProjectId error (projectId: ${projectId}):`, error);
+              this.error = error.message;
+              console.error(`TestDataStore - loadTestCasesByProjectId error (projectId: ${projectId}):`, error);
             } finally {
-            this.loading = false;
+              this.loading = false;
             }
         },
     
@@ -93,8 +90,8 @@ export const useProjectDataStore = defineStore('projectDataStore', {
             this.loading = true;
             this.error = null;
             try {
-            const testCase = await getTestCaseById(testCaseId);
-            console.log(`ProjectDataStore - fetchTestCaseById - Дописать загрузку тест кейса testCaseId = ${testCaseId} testCase = ${testCase}`)
+              const testCase = await getTestCaseById(testCaseId);
+              console.log(`ProjectDataStore - fetchTestCaseById - Дописать загрузку тест кейса testCaseId = ${testCaseId} testCase = ${testCase}`)
             // Если нужно сохранить его «точечно»
             // Но нужно знать projectId, чтобы положить куда-то конкретно
             // Если бэкенд возвращает testCase.projectId:
@@ -105,10 +102,10 @@ export const useProjectDataStore = defineStore('projectDataStore', {
             // Находим индекс, если нужно обновить
             // или добавляем / вставляем
             } catch (error) {
-            this.error = error.message;
-            console.error(`TestDataStore - fetchTestCaseById error (testCaseId: ${testCaseId}):`, error);
+              this.error = error.message;
+              console.error(`TestDataStore - fetchTestCaseById error (testCaseId: ${testCaseId}):`, error);
             } finally {
-            this.loading = false;
+              this.loading = false;
             }
         },
     
@@ -119,14 +116,14 @@ export const useProjectDataStore = defineStore('projectDataStore', {
             console.log(`createTestCase - testCaseData = ${testCaseData}`)
             this.error = null;
             try {
-            const newTestCase = await createTestCaseInProject(projectId, testCaseData);
-            if (!this.testCasesByProject[projectId]) {
-                this.testCasesByProject[projectId] = [];
-            }
-            this.testCasesByProject[projectId].push(newTestCase);
+              const newTestCase = await createTestCaseInProject(projectId, testCaseData);
+              if (!this.testCasesByProject[projectId]) {
+                  this.testCasesByProject[projectId] = [];
+              }
+              this.testCasesByProject[projectId].push(newTestCase);
             } catch (error) {
-            this.error = error.message;
-            console.error(`TestDataStore - createTestCase error (projectId: ${projectId}):`, error);
+              this.error = error.message;
+              console.error(`TestDataStore - createTestCase error (projectId: ${projectId}):`, error);
             }
         },
     
@@ -136,19 +133,41 @@ export const useProjectDataStore = defineStore('projectDataStore', {
         async updateTestCase(projectId, testCaseId, editTestCaseData) {
             this.error = null;
             try {
-            const updatedTestCase = await updateTestCaseById(projectId, testCaseId, editTestCaseData);
-            // Обновим в state
-            const arr = this.testCasesByProject[projectId] || [];
-            const index = arr.findIndex((tc) => tc.id === testCaseId);
-            if (index !== -1) {
-                arr[index] = updatedTestCase;
-            }
+                const updatedTestCase = await updateTestCaseById(projectId, testCaseId, editTestCaseData);
+                // Обновим в state
+                const arr = this.testCasesByProject[projectId] || [];
+                const index = arr.findIndex((tc) => tc.id === testCaseId);
+                if (index !== -1) {
+                    arr[index] = updatedTestCase;
+                }
             } catch (error) {
-            this.error = error.message;
-            console.error(
-                `TestDataStore - updateTestCase error (projectId: ${projectId}, testCaseId: ${testCaseId}):`,
-                error
+              this.error = error.message;
+              console.error(
+                  `TestDataStore - updateTestCase error (projectId: ${projectId}, testCaseId: ${testCaseId}):`,
+                  error
             );
+            }
+        },
+
+        async deleteTestCase(projectId, testCaseId) {
+            console.log(`ProjectDataStore - deleteTestCase = ${testCaseId}`)
+            this.error = null
+            try {
+                await deleteTestCaseById(testCaseId);
+                if (this.testCasesByProject[projectId]) {
+                    this.testCasesByProject[projectId] = this.testCasesByProject[projectId].filter(
+                      (testCase) => testCase.id !== testCaseId
+                    );
+                  }
+              
+                  // Удаляем тест-кейс из allTestCases
+                  this.allTestCases = this.allTestCases.filter(
+                    (testCase) => testCase.id !== testCaseId
+                  );
+                  console.log(`Тест-кейс с ID ${testCaseId} успешно удалён из проекта ${projectId}`);
+            } catch (error) {
+                this.error = error.message;
+                console.error(`ProjectDataStore  - deleteTestCase error testCaseId: ${testCaseId}:`,error);
             }
         },
         /**
@@ -159,18 +178,13 @@ export const useProjectDataStore = defineStore('projectDataStore', {
             const idx = this.allTestCases.findIndex(tc => tc.id === testCase.id);
             if (idx === -1) {
             // Не нашли — добавляем
-            this.allTestCases.push(testCase);
+              this.allTestCases.push(testCase);
             } else {
             // Нашли — обновляем
-            this.allTestCases[idx] = testCase;
+              this.allTestCases[idx] = testCase;
             }
         },
-    
-        /**
-         * TODO: Удаление тест-кейса (когда будет реализовано на бэкенде)
-         * async deleteTestCase(projectId, testCaseId) { ... }
-         */
-    
+        
         /**
          * TODO: Методы для будущих сущностей (чек-листы, статусы, шаги и т.д.)
          * async loadChecklists(projectId) { ... }

@@ -12,6 +12,9 @@
         <button @click="showCreateTestCaseModal = true" class="create-testcase-button">
           Создать тест-кейс
         </button>
+        <button @click="showDeleteTestCaseModal = true" class="delete-testcase-button">
+          Удалить тест-кейс
+        </button>
       </div>
       <div class="testcase-rows">
         <div class="testcase-row" v-for="testCase in testCases" :key="testCase.id">
@@ -25,10 +28,19 @@
         </p>
       </div>
 
+      <!-- Модальное окно создания тест-кейса -->
       <CreateTestCaseModal
         v-if="showCreateTestCaseModal"
         @close="showCreateTestCaseModal = false"
         @create="handleCreateTestCase"
+      />
+
+      <!-- Модальное окно удаления тест-кейса -->
+      <DeleteTestCaseModal
+        v-if="showDeleteTestCaseModal"
+        :projectId="projectId"
+        @close="showDeleteTestCaseModal = false"
+        @delete="handleDeleteTestCase"
       />
     </div>
   </header>
@@ -36,15 +48,16 @@
 
 <script>
 import CreateTestCaseModal from '@/components/CreateTestCaseModal.vue';
+import DeleteTestCaseModal from '@/components/DeleteTestCaseModal.vue';
 import { useRoute } from 'vue-router';
 import { useProjectStore } from '@/stores/ProjectStore';
-// Важно: теперь импортируем то, что реально экспортируем из ProjectDataStore
 import { useProjectDataStore } from '@/stores/ProjectDataStore';
 
 export default {
   name: 'ProjectDetail',
   components: {
     CreateTestCaseModal,
+    DeleteTestCaseModal,
   },
   data() {
     return {
@@ -54,6 +67,7 @@ export default {
       loading: true,
       error: null,
       showCreateTestCaseModal: false,
+      showDeleteTestCaseModal: false,
     };
   },
   methods: {
@@ -62,22 +76,15 @@ export default {
       this.error = null;
 
       try {
-        // Берём store проектов
         const projectStore = useProjectStore();
-        // Берём store тестовых данных
         const dataStore = useProjectDataStore();
 
-        // 1) Загружаем проект
+        // Загружаем проект
         await projectStore.fetchProjectById(this.projectId);
         this.project = projectStore.projects[this.projectId];
 
-        // 2) Загружаем тест-кейсы (из dataStore)
-        //    допустим, метод называется loadTestCasesByProjectId
+        // Загружаем тест-кейсы
         await dataStore.loadTestCasesByProjectId(this.projectId);
-
-        // 3) Достаём массив тест-кейсов
-        //    если у вас state = { testCasesByProject: { [projectId]: [ ... ] } }
-        //    то:
         this.testCases = dataStore.testCasesByProject[this.projectId] || [];
       } catch (e) {
         this.error = 'Ошибка загрузки данных проекта';
@@ -102,6 +109,24 @@ export default {
         this.showCreateTestCaseModal = false;
       } catch (error) {
         console.error('Ошибка при создании тест-кейса:', error);
+      }
+    },
+
+    async handleDeleteTestCase(testCaseId) {
+      try {
+        const dataStore = useProjectDataStore();
+        console.log(`Попытка удалить this.projectId = ${this.projectId} testCaseId = ${testCaseId}`)
+        // Удаляем тест-кейс
+        await dataStore.deleteTestCase(this.projectId, testCaseId);
+
+        // Обновляем список тест-кейсов
+        await dataStore.loadTestCasesByProjectId(this.projectId);
+        this.testCases = dataStore.testCasesByProject[this.projectId] || [];
+
+        // Закрываем модалку
+        this.showDeleteTestCaseModal = false;
+      } catch (error) {
+        console.error('Ошибка при удалении тест-кейса:', error);
       }
     },
   },
@@ -182,6 +207,17 @@ button {
 
 .create-testcase-button:hover {
   background-color: #218838;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.delete-testcase-button {
+  background-color: #dc3545;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.delete-testcase-button:hover {
+  background-color: #c82333;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 

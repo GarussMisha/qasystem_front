@@ -134,6 +134,17 @@ const updateTestCaseById = async (projectId, testCaseId, editTestCaseData) => {
   }
 };
 
+// 11. Удаление тест кейса
+const deleteTestCaseById = async (testCaseId) => {
+  try {
+    const response = await apiClient.delete(`/testcase/${testCaseId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleteTestCaseById: Failed to delete test case with id ${testCaseId}.`, error);
+    throw error;
+  }
+};
+
 export {
   // Проекты
   getAllProjects,
@@ -148,6 +159,7 @@ export {
   createTestCaseInProject,
   getAllTestCaseByProjectId,
   updateTestCaseById,
+  deleteTestCaseById
 };
 
 // Экспорт по умолчанию — сам apiClient, если где-то нужен axios с этими настройками
