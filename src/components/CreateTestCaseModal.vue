@@ -3,11 +3,18 @@
     <div class="modal-content" @click.stop>
       <h2>Создать тест-кейс</h2>
       <form @submit.prevent="submitForm">
-        <input v-model="testCaseData.testCaseName" placeholder="Название тест-кейса" required />
-        <textarea v-model="testCaseData.testCaseDescription" placeholder="Описание" required></textarea>
-        <!-- Можно добавить поле для шагов теста, если нужно -->
-        <button type="submit">Создать</button>
+        <div class="form-group">
+          <label for="projectName">Название тест-кейса:</label>
+          <input v-model="testCaseData.testcaseName" placeholder="Название тест-кейса" required />
+        </div>
+        <div class="form-group">
+          <label for="projectDescription">Описание тест-кейса:</label>
+          <textarea v-model="testCaseData.testcaseDescription" placeholder="Описание"></textarea>
+        </div>
+        <div class="button-group">
+          <button type="submit" class="submit-button">Создать</button>
         <button type="button" @click="closeModal" class="cancel-button">Отмена</button>
+        </div>
       </form>
     </div>
   </div>
@@ -19,31 +26,18 @@ export default {
   data() {
     return {
       testCaseData: {
-        testCaseName: '',
-        testCaseDescription: '',
-        steps: [], // Можно расширить для добавления шагов
-      },
+        testcaseName: '',
+        testcaseDescription: '',
+        steps: [],
+      },      
     };
   },
   methods: {
     submitForm() {
-      // Проверка на наличие данных в обязательных полях
-      if (!this.testCaseData.testCaseName || !this.testCaseData.testCaseDescription) {
-        alert('Пожалуйста, заполните все обязательные поля!');
-        return;
-      }
-
-      // Отправляем данные на создание тест-кейса в родительский компонент
-      this.$emit('create', this.testCaseData);
-
-      // Очистка формы после отправки
-      this.testCaseData.testCaseName = '';
-      this.testCaseData.testCaseDescription = '';
-      this.testCaseData.steps = [];
+      this.$emit('create', this.testCaseData); // Отправляем данные формы в родительский компонент
     },
     closeModal() {
-      // Закрываем модальное окно
-      this.$emit('close');
+      this.$emit('close'); // Закрываем модальное окно
     },
   },
 };
@@ -61,12 +55,59 @@ export default {
   justify-content: center;
   align-items: center;
 }
+
 .modal-content {
   background-color: white;
   padding: 20px;
   border-radius: 8px;
-  max-width: 400px;
+  width: 400px;
+  box-sizing: border-box; /* Учитываем padding в общей ширине */
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center; /* Выравниваем заголовок по центру */
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.form-group input,
+.form-group textarea {
   width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Учитываем padding в общей ширине */
+  color: #333;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between; /* Равномерно распределяем кнопки */
+}
+
+.submit-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  flex: 1; /* Растягиваем кнопку на всю доступную ширину */
+  margin-right: 10px; /* Добавляем отступ между кнопками */
+}
+
+.submit-button:hover {
+  background-color: #218838;
 }
 
 .cancel-button {
@@ -76,6 +117,7 @@ export default {
   padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
+  flex: 1; /* Растягиваем кнопку на всю доступную ширину */
 }
 
 .cancel-button:hover {

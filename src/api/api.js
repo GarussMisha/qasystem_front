@@ -2,24 +2,26 @@ import axios from 'axios';
 
 // Базовая конфигурация для запросов
 const apiClient = axios.create({
-    baseURL: 'http://localhost:9090', // Убираем прокси
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  baseURL: 'http://localhost:9090',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
-// Функции взаимодействия с backend
+/* --------------------------------------------------------------------------
+   Методы для работы с ПРОЕКТАМИ
+   -------------------------------------------------------------------------- */
 
 // 1. Получение всех проектов
 const getAllProjects = async () => {
-    try {
-      const response = await apiClient.get('/project');
-      return response.data;
-    } catch (error) {
-      console.error('Error getAllProjects:', error);
-      throw error;
-    }
-  };
+  try {
+    const response = await apiClient.get('/project');
+    return response.data;
+  } catch (error) {
+    console.error('Error getAllProjects:', error);
+    throw error;
+  }
+};
 
 // 2. Создание проекта
 const createProject = async (data) => {
@@ -32,7 +34,7 @@ const createProject = async (data) => {
   }
 };
 
-// 3. Получение проекта по id
+// 3. Получение проекта по ID
 const getProjectById = async (id) => {
   try {
     const response = await apiClient.get(`/project/${id}`);
@@ -43,7 +45,7 @@ const getProjectById = async (id) => {
   }
 };
 
-// 4. Удаление проекта по id
+// 4. Удаление проекта по ID
 const deleteProjectById = async (id) => {
   try {
     const response = await apiClient.delete(`/project/${id}`);
@@ -54,7 +56,22 @@ const deleteProjectById = async (id) => {
   }
 };
 
-// 5. Получение всех тест-кейсов
+// 5. Обновление (редактирование) проекта по ID
+const updateProjectById = async (id, editProjectData) => {
+  try {
+    const response = await apiClient.put(`/project/${id}`, editProjectData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updateProjectById: Failed to edit project with id ${id}.`, error);
+    throw error;
+  }
+};
+
+/* --------------------------------------------------------------------------
+   Методы для работы с ТЕСТ-КЕЙСАМИ
+   -------------------------------------------------------------------------- */
+
+// 6. Получение всех тест-кейсов (глобально, не только в рамках проекта)
 const getAllTestCases = async () => {
   try {
     const response = await apiClient.get('/testcase');
@@ -65,7 +82,7 @@ const getAllTestCases = async () => {
   }
 };
 
-// 6. Получение тест-кейса по id
+// 7. Получение тест-кейса по ID
 const getTestCaseById = async (id) => {
   try {
     const response = await apiClient.get(`/testcase/${id}`);
@@ -76,13 +93,12 @@ const getTestCaseById = async (id) => {
   }
 };
 
-// 7. Создание тест-кейса в проекте
+// 8. Создание тест-кейса в конкретном проекте 
 const createTestCaseInProject = async (projectId, testCaseData) => {
-  console.log('Вхов в метод createTestCaseInProject')
-  console.log(testCaseData)
+  console.log('Вход в метод createTestCaseInProject, testCaseData:', testCaseData);
   try {
     const response = await apiClient.post(`/project/${projectId}/testcase`, testCaseData);
-    console.log('api - createTestCaseInProject - ' + response.data)
+    console.log('api - createTestCaseInProject response:', response.data);
     return response.data;
   } catch (error) {
     console.error(`Error createTestCaseInProject: Failed to create test case in project with id ${projectId}.`, error);
@@ -90,14 +106,49 @@ const createTestCaseInProject = async (projectId, testCaseData) => {
   }
 };
 
+// 9. Получение всех тест-кейсов проекта по projectId
+const getAllTestCaseByProjectId = async (projectId) => {
+  try {
+    const response = await apiClient.get(`/project/${projectId}/testcase`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error getAllTestCaseByProjectId: Failed to get test cases for project with id ${projectId}.`,
+      error
+    );
+    throw error;
+  }
+};
+
+// 10. Обновление (редактирование) тест-кейса по ID в рамках проекта
+const updateTestCaseById = async (projectId, testCaseId, editTestCaseData) => {
+  try {
+    const response = await apiClient.put(`/project/${projectId}/testcase/${testCaseId}`, editTestCaseData);
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error updateTestCaseById: Failed to edit test case with id ${testCaseId} in project ${projectId}.`,
+      error
+    );
+    throw error;
+  }
+};
+
 export {
+  // Проекты
   getAllProjects,
   createProject,
   getProjectById,
   deleteProjectById,
+  updateProjectById,
+
+  // Тест-кейсы
   getAllTestCases,
   getTestCaseById,
   createTestCaseInProject,
+  getAllTestCaseByProjectId,
+  updateTestCaseById,
 };
 
+// Экспорт по умолчанию — сам apiClient, если где-то нужен axios с этими настройками
 export default apiClient;

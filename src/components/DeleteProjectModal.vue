@@ -22,7 +22,7 @@
 
 <script>
 import { computed } from 'vue';
-import { useProjectStore } from '@/stores/AllProjectStore'; // Импортируем хранилище проектов
+import { useProjectStore } from '@/stores/ProjectStore'
 
 export default {
   name: 'DeleteProjectModal',

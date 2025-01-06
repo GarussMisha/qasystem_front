@@ -1,61 +1,78 @@
 <template>
   <header class="project-list">
-    <div class="project-text">
-      <h1>Страница проектов</h1>
-      <p>Здесь отображаются все проекты</p>
+    <div class="project-header">
+      <h1>Проекты</h1>
     </div>
+    <!-- Индикация загрузки или ошибки -->
     <div v-if="loading">Загрузка проектов...</div>
     <div v-else-if="error" class="error-message">{{ error }}</div>
     <div v-else>
-      <button @click="showCreateProjectModal = true" class="create-project-button">Создать проект</button>
-      <button @click="showDeleteProjectModal = true" class="delete-project-button">Удалить проект</button>
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="project in projects" :key="project.id" @click="goToProjectDetail(project.id)">
-              <td>{{ project.id }}</td>
-              <td :title="project.projectName">{{ truncateText(project.projectName, 30) }}</td>
-              <td :title="project.projectDescription">{{ truncateText(project.projectDescription, 30) }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <p>{{ returnData() }}</p>
+      <!-- Кнопки создания и удаления -->
+      <div class="button-container">
+        <button @click="showCreateProjectModal = true" class="create-project-button">
+          Создать проект
+        </button>
+        <button @click="showDeleteProjectModal = true" class="delete-project-button">
+          Удалить проект
+        </button>
       </div>
-      <!-- Модальное окно -->
-      <CreateProjectModal v-if="showCreateProjectModal" @close="showCreateProjectModal = false" @create="handleCreateProject" />
-      <DeleteProjectModal v-if="showDeleteProjectModal" @delete="handleDeleteProject" @close="showDeleteProjectModal = false" />
+
+      <!-- Таблица проектов -->
+      <div class="project-rows">
+        <div
+          class="project-row"
+          v-for="project in projects"
+          :key="project.id"
+          @click="goToProjectDetail(project.id)"
+        >
+          <div class="project-content">
+            <h3>{{ project.projectName }}</h3>
+            <p>{{ truncateText(project.projectDescription, 100) }}</p>
+          </div>
+        </div>
+      </div>
+      <!-- Модальное окно создания проекта -->
+      <CreateProjectModal
+        v-if="showCreateProjectModal"
+        @close="showCreateProjectModal = false"
+        @create="handleCreateProject"
+      />
+
+      <!-- Модальное окно удаления проекта -->
+      <DeleteProjectModal
+        v-if="showDeleteProjectModal"
+        @delete="handleDeleteProject"
+        @close="showDeleteProjectModal = false"
+      />
     </div>
   </header>
 </template>
 
 <script>
-import { useProjectStore } from '@/stores/AllProjectStore'; // Импортируем хранилище
-import CreateProjectModal from '@/components/CreateProjectModal.vue'; // Импортируем модальное окно
-import DeleteProjectModal from '@/components/DeleteProjectModal.vue';
+import CreateProjectModal from '@/components/CreateProjectModal.vue'; // Модальное окно для создания
+import DeleteProjectModal from '@/components/DeleteProjectModal.vue'; // Модальное окно для удаления
+import { useProjectStore } from '@/stores/ProjectStore';
 
 export default {
   name: 'ProjectList',
   components: {
-    CreateProjectModal, // Регистрируем модальное окно
+    CreateProjectModal,
     DeleteProjectModal,
   },
   data() {
     return {
-      projectStore: useProjectStore(), // Инициализируем хранилище
-      showCreateProjectModal: false, // Флаг для отображения модального окна
+      showCreateProjectModal: false,
       showDeleteProjectModal: false,
     };
   },
   computed: {
+    // Берем наш store
+    projectStore() {
+      return useProjectStore();
+    },
+    // Извлекаем массив всех проектов
     projects() {
-      return this.projectStore.projects;
+      return this.projectStore.allProjects;
     },
     loading() {
       return this.projectStore.loading;
@@ -65,10 +82,8 @@ export default {
     },
   },
   methods: {
-    returnData() {
-      console.log(this.projectStore.projects)
-    },
     truncateText(text, length) {
+      if (!text) return '';
       if (text.length > length) {
         let truncated = text.substr(0, length);
         if (truncated.lastIndexOf(' ') > 0) {
@@ -78,111 +93,150 @@ export default {
       }
       return text;
     },
-    // Метод для загрузки проектов
+    // Загружаем проекты
     async fetchProjects() {
-      await this.projectStore.loadProjects();
+      await this.projectStore.loadAllProjects();
     },
-    // Метод для создания проекта
+    // Создаём проект (обработчик события из CreateProjectModal)
     async handleCreateProject(projectData) {
-      await this.projectStore.addProject(projectData);
-      this.showCreateProjectModal = false; // Закрываем модальное окно
+      await this.projectStore.createNewProject(projectData);
+      this.showCreateProjectModal = false;
     },
+    // Удаляем проект (обработчик события из DeleteProjectModal)
     async handleDeleteProject(projectId) {
-      console.log('Deleting project with ID:', projectId); // Логируем id проекта, который нужно удалить
-      await this.projectStore.removeProjectById(projectId); // Удаляем проект из хранилища
-      this.showDeleteProjectModal = false; // Закрываем модальное окно
+      console.log('Deleting project with ID:', projectId);
+      await this.projectStore.deleteProject(projectId);
+      this.showDeleteProjectModal = false;
     },
+    // Переходим на детальную страницу проекта
     goToProjectDetail(projectId) {
-      console.log({projectId})
-      this.$router.push({ name: 'ProjectDetail', params: { id: projectId}});
+      this.$router.push({ name: 'ProjectDetail', params: { id: projectId } });
     },
   },
   async created() {
-    // Загружаем проекты при создании компонента
+    // При загрузке компонента сразу тянем список проектов
     await this.fetchProjects();
   },
 };
 </script>
 
 <style scoped>
+/* Общие стили */
 .project-list {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+/* Заголовок */
+.project-header {
+  margin-bottom: 20px;
+  padding: 20px;
+  background-color: white;
+  border-bottom: 1px solid #ddd;
+}
+
+.project-header h1 {
+  font-size: 28px;
+  margin: 0;
+}
+
+.project-header p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+/* Список строк проектов */
+.project-rows {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 10px 20px;
-  background-color: #9e9e9e;
-  color: white;
+  gap: 10px;
+  margin-top: 20px;
 }
 
-.error-message {
-  color: red;
-  font-size: 14px;
+/* Строка проекта */
+.project-row {
+  padding: 15px 20px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
 }
 
+.project-row:hover {
+  background-color: #f1f1f1;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.project-content h3 {
+  font-size: 16px;
+  margin: 0 0 5px;
+  color: #007bff;
+  font-weight: 600;
+}
+
+.project-content p {
+  margin: 0;
+  font-size: 13px;
+  color: #6c757d;
+}
+
+/* Разделитель между строками */
+.project-row + .project-row {
+  border-top: 1px solid #e9ecef;
+}
+
+/* Контейнер для кнопок */
+.button-container {
+  display: flex;
+  justify-content: flex-end; /* Расположение кнопок справа */
+  gap: 10px; /* Расстояние между кнопками */
+  margin-top: 10px;
+}
+
+/* Базовые стили кнопок */
+button {
+  font-size: 12px; /* Сделаем кнопки меньше */
+  font-weight: bold;
+  padding: 5px 10px; /* Уменьшенный внутренний отступ */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Кнопка "Создать проект" */
 .create-project-button {
   background-color: #28a745;
   color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-bottom: 20px;
-}
-
-.delete-project-button{
-  background-color: #a72828;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-bottom: 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .create-project-button:hover {
   background-color: #218838;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Кнопка "Удалить проект" */
+.delete-project-button {
+  background-color: #dc3545;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .delete-project-button:hover {
-  background-color: #831e1e
+  background-color: #c82333;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.table-container {
-  width: 100%;
-  overflow-x: auto;
+/* Адаптивность кнопок */
+button:active {
+  transform: translateY(2px);
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: rgb(255, 255, 255);
-  color: #000000;
-  box-shadow: 2 20px 50px rgb(255, 255, 255);
-}
-
-th {
-  padding: 5px;
-  text-align: left;
-  background-color: #23005a;
-  color: white;
-  font-weight: bold;
-}
-
-th:hover {
-  background-color: #2e0077;
-}
-
-td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #000000;
-}
-
-tr {
-  cursor: pointer; /* Делаем курсор рукой при наведении */
-}
-
-tr:hover {
-  background-color: #e9e9e9;
-}
 </style>

@@ -1,19 +1,35 @@
 <template>
   <header class="path-bar">
     <div class="path-text">
-      <p>{{ path }}</p>
+      <!-- Простейший вариант: просто выводим строку "Home > projects > 25" -->
+      <p>{{ breadcrumbString }}</p>
     </div>
   </header>
 </template>
 
 <script>
-//import { useProjectStore } from '@/stores/projectStore'; // Импортируем хранилище проектов
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 
 export default {
   name: 'PathBar',
-  data() {
+  setup() {
+    const route = useRoute();
+
+    // Разбиваем путь на сегменты и делаем "Home > project > 25" и т.д.
+    const breadcrumbString = computed(() => {
+      if (!route.path) return '';
+      const segments = route.path.split('/').filter(Boolean); 
+      // Для пути "/projects/12/testcases" получим ["projects", "12", "testcases"]
+      if (segments.length === 0) {
+        return 'Home';
+      }
+      // Превращаем в "Home > projects > 12 > testcases"
+      return 'Home > ' + segments.join(' > ');
+    });
+
     return {
-      path: '', // Здесь будет храниться текущий путь
+      breadcrumbString
     };
   },
 };
@@ -22,10 +38,9 @@ export default {
 <style scoped>
 .path-bar {
   display: flex;
-  height: 20px;
   align-items: center;
   padding: 5px 20px;
   background-color: #dddddd;
-  color: rgb(0, 0, 0);
+  color: #000000;
 }
 </style>
