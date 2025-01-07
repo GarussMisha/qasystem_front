@@ -11,97 +11,94 @@ export const useProjectStore = defineStore('projectsStore', {
     state: () => ({
         projects: {}, //Храним проекты в формате { [projectId]: { id, name, description, ... } }
         loading: false,
-        error: null,
     }),
     
     getters: {
-        allProjects: (state) => Object.values(state.projects), // Вернёт массив всех проектов
-
-        projectCount: (state) => Object.keys(state.projects).length, // Вернёт количество проектов
-        
-        getProjectById: (state) => (projectId) => {
-            return state.projects[projectId]; // Получить проект по ID (пригодится, если хотим брать данные из state без запроса)
-          },
+        allProjects_store: (state) => Object.values(state.projects), // Вернёт массив всех проектов
+        projectCount_store: (state) => Object.keys(state.projects).length, // Вернёт количество проектов
+        getProjectById_store: (state) => (projectId) => {return state.projects[projectId] || {}; }, // Получить проект по ID (пригодится, если хотим брать данные из state без запроса)
     },
     
     actions: {
-        async loadAllProjects() { // Загрузить все проекты
-            this.loading = true;
-            this.error = null;
-            try {
-                const allProjects = await getAllProjects();
-                const mappedProjects = allProjects.reduce((acc, project) => {
-                    acc[project.id] = project;
-                    return acc;
-                }, {});
-                this.projects = mappedProjects;
-            } catch (error) {
-                this.error = error.message;
-                console.error('ProjectStore - loadAllProjects error:', error);
-            } finally {
-                this.loading = false;
-            }
-        },
-
-        async fetchProjectById(projectId) { // Загрузить конкретный проект по ID (и обновить его в state)
-            this.loading = true;
-            this.error = null;
-            try {
-              const project = await getProjectById(projectId);
-              this.projects[projectId] = project;
-            } catch (error) {
-              this.error = error.message;
-              console.error(`ProjectStore - fetchProjectById error (id: ${projectId}):`, error);
-            } finally {
-              this.loading = false;
-            }
-        },
-
-        async createNewProject(projectData) { // Создать новый проект
-            this.error = null;
-            try {
-              const newProject = await createProject(projectData);
-              // Помещаем его в state
-              this.projects[newProject.id] = newProject;
-            } catch (error) {
-              this.error = error.message;
-              console.error('ProjectStore - createNewProject error:', error);
-            }
-          },
-      
-
-        async updateProject(projectId, editProjectData) { // Обновить (отредактировать) существующий проект
-            this.error = null;
-            try {
-              const oldProject = this.projects[projectId] || {};
-
-              const dataToSend = {
-                id: oldProject.id,
-                projectName: oldProject.projectName,                     // Берём старое имя
-                projectDescription: editProjectData.projectDescription,      // Новое описание
-                // ...если нужны ещё поля, добавьте их
-              };
-
-              
-              const updatedProject = await updateProjectById(projectId, dataToSend);
-              // Здесь updatedProject может быть частичным
-              this.projects[projectId] = updatedProject;
-              
-            } catch (error) {
-              this.error = error.message;
-              console.error(`ProjectStore - updateProject error (id: ${projectId}):`, error);
-            }
-        },
-      
-        async deleteProject(projectId) { // Удалить проект по ID
-            this.error = null;
-            try {
-              await deleteProjectById(projectId);
-              delete this.projects[projectId]; // Убираем из state
-            } catch (error) {
-              this.error = error.message;
-              console.error(`ProjectStore - deleteProject error (id: ${projectId}):`, error);
-            }
-        },
+      // 1.1. Загрузить все проекты
+      async loadAllProjects() { 
+        this.loading = true;
+        try {
+            const allProjects = await getAllProjects();
+            const mappedProjects = allProjects.reduce((acc, project) => {
+                acc[project.id] = project;
+                return acc;
+            }, {});
+            this.projects = mappedProjects;
+        } catch (error) {
+            console.error('ProjectStore - loadAllProjects error:', error);
+        } finally {
+            this.loading = false;
+        }
+      },
+      // 1.2. Загрузить конкретный проект по ID (и обновить его в state)
+      async fetchProjectById(projectId) {
+        if (this.projects[projectId]){
+          return this.projects[projectId]
+        }
+        try {
+          const project = await getProjectById(projectId);
+          this.projects[projectId] = project;
+        } catch (error) {
+          console.error(`ProjectStore - fetchProjectById error (id: ${projectId}):`, error);
+          return {};
+        }
+      },
+      // 1.3. Создать новый проект
+      async createNewProject({ name, description }) {
+        try {
+          const projectData = {
+            projectName: name,
+            projectDescription: description,
+          }
+          const newProject = await createProject(projectData);
+          this.projects[newProject.id] = newProject;
+          return true;
+        } catch (error) {
+          console.error('ProjectStore - createNewProject error:', error);
+          return false;
+        }
+      },
+      // 1.4. Обновить (отредактировать) существующий проект
+      async updateProject(projectId, { projectName, projectDescription }) {
+        if (!this.projects[projectId]) {
+          console.error(`ProjectStore - updateProject - Проект с ID ${projectId} не найден в хранилище.`);
+          return false;
+        }
+        try {
+          const oldProject = this.projects[projectId] || {};
+          const dataToSend = {
+            id: oldProject.id,
+            projectName: projectName || oldProject.projectName,
+            projectDescription: projectDescription || oldProject.projectDescription,
+          };
+          const updatedProject = await updateProjectById(projectId, dataToSend);
+          this.projects[projectId] = updatedProject;
+          return true;
+        } catch (error) {
+          console.error(`ProjectStore - updateProject - error (id: ${projectId}):`, error);
+          return false;
+        }
+      },
+      // 1.5. Удалить проект по ID
+      async deleteProject(projectId) {
+        if (!this.projects[projectId]) {
+          console.warn(`ProjectStore - deleteProject - Проект с ID ${projectId} не найден в хранилище. Удаление не требуется.`);
+          return false;
+        }
+        try {
+          await deleteProjectById(projectId);
+          delete this.projects[projectId];
+          return true;
+        } catch (error) {
+          console.error(`ProjectStore - deleteProject - error (id: ${projectId}):`, error);
+          return false;
+        }
+      },
     },
 });
