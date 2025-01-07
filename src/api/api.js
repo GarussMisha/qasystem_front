@@ -1,8 +1,10 @@
 import axios from 'axios';
 
+const API_URL = process.env.VUE_APP_API_URL || 'http://localhost:9090';
+
 // Базовая конфигурация для запросов
 const apiClient = axios.create({
-  baseURL: 'http://localhost:9090',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -18,7 +20,7 @@ const getAllProjects = async () => {
     const response = await apiClient.get('/project');
     return response.data;
   } catch (error) {
-    console.error('Error getAllProjects:', error);
+    console.error('Error -> (api.js/getAllProjects):', error);
     throw error;
   }
 };
@@ -29,40 +31,40 @@ const createProject = async (data) => {
     const response = await apiClient.post('/project', data);
     return response.data;
   } catch (error) {
-    console.error('Error createProject:', error);
+    console.error('Error -> (api.js/createProject):', error);
     throw error;
   }
 };
 
 // 3. Получение проекта по ID
-const getProjectById = async (id) => {
+const getProjectById = async (projectId) => {
   try {
-    const response = await apiClient.get(`/project/${id}`);
+    const response = await apiClient.get(`/project/${projectId}`);
     return response.data;
   } catch (error) {
-    console.error(`Error getProjectById: Project with id ${id} not found.`, error);
+    console.error(`Error -> (api.js/getProjectById) Project with id ${projectId} not found.`, error);
     throw error;
   }
 };
 
 // 4. Удаление проекта по ID
-const deleteProjectById = async (id) => {
+const deleteProjectById = async (projectId) => {
   try {
-    const response = await apiClient.delete(`/project/${id}`);
+    const response = await apiClient.delete(`/project/${projectId}`);
     return response.data;
   } catch (error) {
-    console.error(`Error deleteProjectById: Failed to delete project with id ${id}.`, error);
+    console.error(`'Error -> (api.js/deleteProjectById) Failed to delete project with id ${projectId}.`, error);
     throw error;
   }
 };
 
 // 5. Обновление (редактирование) проекта по ID
-const updateProjectById = async (id, editProjectData) => {
+const updateProjectById = async (projectId, editProjectData) => {
   try {
-    const response = await apiClient.put(`/project/${id}`, editProjectData);
+    const response = await apiClient.put(`/project/${projectId}`, editProjectData);
     return response.data;
   } catch (error) {
-    console.error(`Error updateProjectById: Failed to edit project with id ${id}.`, error);
+    console.error(`'Error -> (api.js/updateProjectById) Failed to edit project with id ${projectId}. Data = ${editProjectData}`, error);
     throw error;
   }
 };
@@ -77,31 +79,29 @@ const getAllTestCases = async () => {
     const response = await apiClient.get('/testcase');
     return response.data;
   } catch (error) {
-    console.error('Error getAllTestCases: Failed to fetch test cases.', error);
+    console.error('Error -> (api.js/getAllTestCases):', error);
     throw error;
   }
 };
 
 // 7. Получение тест-кейса по ID
-const getTestCaseById = async (id) => {
+const getTestCaseById = async (testCaseId) => {
   try {
-    const response = await apiClient.get(`/testcase/${id}`);
+    const response = await apiClient.get(`/testcase/${testCaseId}`);
     return response.data;
   } catch (error) {
-    console.error(`Error getTestCaseById: Test case with id ${id} not found.`, error);
+    console.error(`'Error -> (api.js/getTestCaseById):' Test case with id ${testCaseId} not found.`, error);
     throw error;
   }
 };
 
 // 8. Создание тест-кейса в конкретном проекте 
 const createTestCaseInProject = async (projectId, testCaseData) => {
-  console.log('Вход в метод createTestCaseInProject, testCaseData:', testCaseData);
   try {
     const response = await apiClient.post(`/project/${projectId}/testcase`, testCaseData);
-    console.log('api - createTestCaseInProject response:', response.data);
     return response.data;
   } catch (error) {
-    console.error(`Error createTestCaseInProject: Failed to create test case in project with id ${projectId}.`, error);
+    console.error(`'Error -> (api.js/createTestCaseInProject):' Failed to create test case in project with id ${projectId}. TestCaseData = ${testCaseData}`, error);
     throw error;
   }
 };
@@ -112,8 +112,7 @@ const getAllTestCaseByProjectId = async (projectId) => {
     const response = await apiClient.get(`/project/${projectId}/testcase`);
     return response.data;
   } catch (error) {
-    console.error(
-      `Error getAllTestCaseByProjectId: Failed to get test cases for project with id ${projectId}.`,
+    console.error(`'Error -> (api.js/getAllTestCaseByProjectId):' Failed to get test cases for project with id ${projectId}.`,
       error
     );
     throw error;
@@ -126,10 +125,7 @@ const updateTestCaseById = async (projectId, testCaseId, editTestCaseData) => {
     const response = await apiClient.put(`/project/${projectId}/testcase/${testCaseId}`, editTestCaseData);
     return response.data;
   } catch (error) {
-    console.error(
-      `Error updateTestCaseById: Failed to edit test case with id ${testCaseId} in project ${projectId}.`,
-      error
-    );
+    console.error(`'Error -> (api.js/updateTestCaseById):' Failed to edit test case with id ${testCaseId} in project ${projectId}. EditTestCaseData = ${editTestCaseData}`, error);
     throw error;
   }
 };
@@ -140,7 +136,7 @@ const deleteTestCaseById = async (testCaseId) => {
     const response = await apiClient.delete(`/testcase/${testCaseId}`);
     return response.data;
   } catch (error) {
-    console.error(`Error deleteTestCaseById: Failed to delete test case with id ${testCaseId}.`, error);
+    console.error(`'Error -> (api.js/deleteTestCaseById):' Failed to delete test case with id ${testCaseId}.`, error);
     throw error;
   }
 };
