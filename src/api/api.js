@@ -11,10 +11,10 @@ const apiClient = axios.create({
 });
 
 /* --------------------------------------------------------------------------
-   Методы для работы с ПРОЕКТАМИ
+   1. Методы для работы с ПРОЕКТАМИ
    -------------------------------------------------------------------------- */
 
-// 1. Получение всех проектов
+// 1.1. Получение всех проектов
 const getAllProjects = async () => {
   try {
     const response = await apiClient.get('/project');
@@ -25,7 +25,7 @@ const getAllProjects = async () => {
   }
 };
 
-// 2. Создание проекта
+// 1.2. Создание проекта
 const createProject = async (data) => {
   try {
     const response = await apiClient.post('/project', data);
@@ -36,7 +36,7 @@ const createProject = async (data) => {
   }
 };
 
-// 3. Получение проекта по ID
+// 1.3. Получение проекта по projectId
 const getProjectById = async (projectId) => {
   try {
     const response = await apiClient.get(`/project/${projectId}`);
@@ -47,7 +47,7 @@ const getProjectById = async (projectId) => {
   }
 };
 
-// 4. Удаление проекта по ID
+// 1.4. Удаление проекта по ID
 const deleteProjectById = async (projectId) => {
   try {
     const response = await apiClient.delete(`/project/${projectId}`);
@@ -58,7 +58,7 @@ const deleteProjectById = async (projectId) => {
   }
 };
 
-// 5. Обновление (редактирование) проекта по ID
+// 1.5. Обновление (редактирование) проекта по projectId
 const updateProjectById = async (projectId, editProjectData) => {
   try {
     const response = await apiClient.put(`/project/${projectId}`, editProjectData);
@@ -70,10 +70,10 @@ const updateProjectById = async (projectId, editProjectData) => {
 };
 
 /* --------------------------------------------------------------------------
-   Методы для работы с ТЕСТ-КЕЙСАМИ
+   2. Методы для работы с ТЕСТ-КЕЙСАМИ
    -------------------------------------------------------------------------- */
 
-// 6. Получение всех тест-кейсов (глобально, не только в рамках проекта)
+// 2.1. Получение всех тест-кейсов (глобально, не только в рамках проекта)
 const getAllTestCases = async () => {
   try {
     const response = await apiClient.get('/testcase');
@@ -84,7 +84,7 @@ const getAllTestCases = async () => {
   }
 };
 
-// 7. Получение тест-кейса по ID
+// 2.2. Получение тест-кейса по testCaseId
 const getTestCaseById = async (testCaseId) => {
   try {
     const response = await apiClient.get(`/testcase/${testCaseId}`);
@@ -95,7 +95,7 @@ const getTestCaseById = async (testCaseId) => {
   }
 };
 
-// 8. Создание тест-кейса в конкретном проекте 
+// 2.3. Создание тест-кейса в конкретном проекте 
 const createTestCaseInProject = async (projectId, testCaseData) => {
   try {
     const response = await apiClient.post(`/project/${projectId}/testcase`, testCaseData);
@@ -106,7 +106,7 @@ const createTestCaseInProject = async (projectId, testCaseData) => {
   }
 };
 
-// 9. Получение всех тест-кейсов проекта по projectId
+// 2.4. Получение всех тест-кейсов проекта по projectId
 const getAllTestCaseByProjectId = async (projectId) => {
   try {
     const response = await apiClient.get(`/project/${projectId}/testcase`);
@@ -119,7 +119,7 @@ const getAllTestCaseByProjectId = async (projectId) => {
   }
 };
 
-// 10. Обновление (редактирование) тест-кейса по ID в рамках проекта
+// 2.5. Обновление (редактирование) тест-кейса по ID в рамках проекта
 const updateTestCaseById = async (projectId, testCaseId, editTestCaseData) => {
   try {
     const response = await apiClient.put(`/project/${projectId}/testcase/${testCaseId}`, editTestCaseData);
@@ -130,7 +130,7 @@ const updateTestCaseById = async (projectId, testCaseId, editTestCaseData) => {
   }
 };
 
-// 11. Удаление тест кейса
+// 2.6. Удаление тест кейса
 const deleteTestCaseById = async (testCaseId) => {
   try {
     const response = await apiClient.delete(`/testcase/${testCaseId}`);
