@@ -4,10 +4,11 @@
       <h1 class="project-name">{{ project?.projectName }}</h1>
       <p class="project-description">{{ project?.projectDescription || 'Описание отсутствует' }}</p>
     </div>
-
+    <!-- Индикация загрузки или ошибки -->
     <div v-if="loading">Загрузка данных проекта...</div>
     <div v-else-if="error" class="error-message">{{ error }}</div>
     <div v-else>
+      <!-- Кнопки создания и удаления -->
       <div class="button-container">
         <button @click="showCreateTestCaseModal = true" class="create-testcase-button">
           Создать тест-кейс
@@ -16,18 +17,18 @@
           Удалить тест-кейс
         </button>
       </div>
-      <div class="testcase-rows">
-        <div class="testcase-row" v-for="testCase in testCases" :key="testCase.id">
+      <!-- Таблица проектов -->
+       <div class="testcase-rows">
+        <div class="testcase-row" v-for="testCase in testCases" :key="testCase.id" @click="goToTestCaseDetail(projectId, testCase.id)">
           <div class="testcase-content">
             <h3>{{ testCase.testcaseName }}</h3>
             <p>{{ testCase.testcaseDescription }}</p>
           </div>
         </div>
-        <p v-if="testCases.length === 0" class="no-testcases-message">
-          Тест-кейсы отсутствуют
-        </p>
-      </div>
-
+       </div>
+       <div>
+        <button class="back-button" @click="goBack">Назад</button>
+       </div>
       <!-- Модальное окно создания тест-кейса -->
       <CreateTestCaseModal
         v-if="showCreateTestCaseModal"
@@ -129,10 +130,17 @@ export default {
         console.error('Ошибка при удалении тест-кейса:', error);
       }
     },
+    goToTestCaseDetail(projectId, testCaseId) {
+      console.log(`goToTestCaseDetail - projectId = ${projectId}, testCaseId = ${testCaseId}`)
+      this.$router.push({ name: 'TestCaseDetail', params: { projectId: projectId, testCaseId: testCaseId} });
+    },
+    goBack() {
+      this.$router.push(`/projects`);
+    },
   },
   mounted() {
     const route = useRoute();
-    this.projectId = route.params.id;
+    this.projectId = route.params.projectId;
     this.fetchProjectData();
   },
 };
@@ -263,5 +271,13 @@ button {
   font-size: 14px;
   color: #888;
   margin-top: 20px;
+}
+.back-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+.back-button:hover {
+  background-color: #5a6268;
 }
 </style>

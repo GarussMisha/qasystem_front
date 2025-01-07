@@ -40,7 +40,23 @@ export const useProjectDataStore = defineStore('projectDataStore', {
         const list = state.testCasesByProject[projectId];
         return list ? list.length : 0;
       },
-  
+      
+      getTestCaseById: (state) => (testCaseId) => {
+        console.log(`ProjectDataStore - getTestCaseById - Ищем тест-кейс ${testCaseId}`)
+        // Ищем в allTestCases
+        const testCase = state.allTestCases.find(tc => tc.id === testCaseId);
+        if (testCase) return testCase;
+      
+        // Если в allTestCases не нашли, ищем по проектам
+        for (const projectId in state.testCasesByProject) {
+          const projectTestCases = state.testCasesByProject[projectId];
+          const testCaseInProject = projectTestCases.find(tc => tc.id === testCaseId);
+          if (testCaseInProject) return testCaseInProject;
+        }
+        
+        // Если не найдено, возвращаем null
+        return null;
+      },
       // TODO: геттеры для будущих объектов
       // checklistsForProject: (state) => (projectId) => {
       //   return state.checklistsByProject[projectId] || [];

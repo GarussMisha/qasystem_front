@@ -7,6 +7,8 @@ import ProjectDetail from '@/views/ProjectDetail.vue';
 import InfoPage from "./views/InfoPage.vue";
 import ProfilePage from "./views/ProfilePage.vue";
 import CheckStores from "./views/CheckStores.vue";
+import TestCaseDetail from '@/views/TestCaseDetail.vue';
+
 
 // Определяем паршруты
 const routes = [
@@ -21,7 +23,7 @@ const routes = [
         component: ProjectList,
     },
     {
-        path: '/projects/:id',
+        path: '/projects/:projectId',
         name: 'ProjectDetail',
         component: ProjectDetail,
     },
@@ -39,6 +41,11 @@ const routes = [
         path: '/checkstores',
         name: 'CheckStores',
         component: CheckStores,
+    },
+    {
+        path: '/projects/:projectId/testcase/:testCaseId',
+        name: 'TestCaseDetail',
+        component: TestCaseDetail,
     },
 ];
 

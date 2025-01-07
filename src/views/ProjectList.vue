@@ -16,7 +16,6 @@
           Удалить проект
         </button>
       </div>
-
       <!-- Таблица проектов -->
       <div class="project-rows">
         <div
@@ -110,7 +109,7 @@ export default {
     },
     // Переходим на детальную страницу проекта
     goToProjectDetail(projectId) {
-      this.$router.push({ name: 'ProjectDetail', params: { id: projectId } });
+      this.$router.push({ name: 'ProjectDetail', params: { projectId: projectId } });
     },
   },
   async created() {
