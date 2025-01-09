@@ -6,7 +6,6 @@ import ProjectList from '@/views/ProjectList.vue';
 import ProjectDetail from '@/views/ProjectDetail.vue';
 import InfoPage from "./views/InfoPage.vue";
 import ProfilePage from "./views/ProfilePage.vue";
-import CheckStores from "./views/CheckStores.vue";
 import TestCaseDetail from '@/views/TestCaseDetail.vue';
 
 
@@ -36,11 +35,6 @@ const routes = [
         path: '/profile',
         name: 'ProfilePage',
         component: ProfilePage,
-    },
-    {
-        path: '/checkstores',
-        name: 'CheckStores',
-        component: CheckStores,
     },
     {
         path: '/projects/:projectId/testcase/:testCaseId',

@@ -11,7 +11,6 @@
         <button @click="goToInfo" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.4s ease' }">Информация</button>
         <button @click="goToProfile" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.4s ease' }">Профиль</button>
         <button @click="goToProjectList" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.4s ease' }">Проекты</button>
-        <button @click="goToCheckStore" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.4s ease' }">Проверка хранилищь</button>
       </div>
     </div>
   </template>
@@ -37,9 +36,6 @@
       },
       goToProjectList() {
         this.$router.push({ name: 'ProjectList' });
-      },
-      goToCheckStore() {
-        this.$router.push({ name: 'CheckStores' });
       },
     }
   };

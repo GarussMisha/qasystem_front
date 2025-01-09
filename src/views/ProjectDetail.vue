@@ -1,283 +1,255 @@
+<!-- ProjectDetail.vue -->
 <template>
-  <header class="project-detail">
-    <div class="project-header">
-      <h1 class="project-name">{{ project?.projectName }}</h1>
-      <p class="project-description">{{ project?.projectDescription || 'Описание отсутствует' }}</p>
-    </div>
-    <!-- Индикация загрузки или ошибки -->
-    <div v-if="loading">Загрузка данных проекта...</div>
-    <div v-else-if="error" class="error-message">{{ error }}</div>
-    <div v-else>
-      <!-- Кнопки создания и удаления -->
-      <div class="button-container">
-        <button @click="showCreateTestCaseModal = true" class="create-testcase-button">
-          Создать тест-кейс
-        </button>
-        <button @click="showDeleteTestCaseModal = true" class="delete-testcase-button">
-          Удалить тест-кейс
-        </button>
-      </div>
-      <!-- Таблица проектов -->
-       <div class="testcase-rows">
-        <div class="testcase-row" v-for="testCase in testCases" :key="testCase.id" @click="goToTestCaseDetail(projectId, testCase.id)">
-          <div class="testcase-content">
-            <h3>{{ testCase.testcaseName }}</h3>
-            <p>{{ testCase.testcaseDescription }}</p>
-          </div>
-        </div>
-       </div>
-       <div>
-        <button class="back-button" @click="goBack">Назад</button>
-       </div>
-      <!-- Модальное окно создания тест-кейса -->
-      <CreateTestCaseModal
-        v-if="showCreateTestCaseModal"
-        @close="showCreateTestCaseModal = false"
-        @create="handleCreateTestCase"
-      />
+  <div class="page-container">
+    <!-- Шапка с информацией о проекте -->
+    <div class="page-header">
+      <h1 class="page-title">
+        {{ project?.projectName }}
+        <span class="page-id">(id:{{ project?.id }})</span>
+      </h1>
+      <p class="page-description">{{ project?.projectDescription }}</p>
 
-      <!-- Модальное окно удаления тест-кейса -->
-      <DeleteTestCaseModal
-        v-if="showDeleteTestCaseModal"
-        :projectId="projectId"
-        @close="showDeleteTestCaseModal = false"
-        @delete="handleDeleteTestCase"
-      />
+      <!-- Дата создания проекта -->
+      <p class="page-created">
+        Дата создания: 
+        <span v-if="project?.dateOfCreated">
+          {{ formatDate(project.dateOfCreated) }}
+        </span>
+        <span v-else>Неизвестно</span>
+      </p>
+
+      <!-- Блок кнопок (Редактировать/Удалить) -->
+      <div class="page-actions">
+        <button class="btn btn-edit" @click="editProject">Редактировать проект</button>
+        <button class="btn btn-delete" @click="deleteProject">Удалить проект</button>
+      </div>
     </div>
-  </header>
+
+    <!-- Блок действий (справа) -->
+    <div class="top-actions">
+      <!-- Фильтр (заглушка) -->
+      <div class="filter-dropdown">
+        <select v-model="selectedFilter">
+          <option value="">Фильтрация</option>
+          <option value="filter1">Тест-кейсы созданные мной</option>
+          <option value="filter1">Тест-кейсы назначенные на меня</option>
+          <option value="filter2">Активные Тест-кейсы</option>
+          <option value="filter3">Завершенные Тест-кейсы</option>
+        </select>
+      </div>
+
+      <!-- Поле поиска (по имени или ID тест-кейса) -->
+      <div class="search-area">
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Поиск тест-кейса"
+        />
+      </div>
+      
+      <!-- Кнопка создания тест-кейса -->
+      <button class="btn btn-create" @click="createTestCase">
+        Создать тест-кейс
+      </button>
+    </div>
+
+    <!-- Контейнер для списка тест-кейсов -->
+    <div class="list-container">
+      <ul class="list">
+        <li
+          v-for="testcase in filteredTestCases"
+          :key="testcase.id"
+          class="list-item"
+          @click="goToTestCaseDetail(testcase.id)"
+        >
+          <h2 class="item-title">
+            {{ testcase.testcaseName }}
+            <span class="item-id">(id:{{ testcase.id }})</span>
+          </h2>
+          <p class="item-desc">
+            <span v-if="testcase.testcaseDescription">
+              {{ testcase.testcaseDescription }}
+            </span>
+            <span v-else>Нет описания</span>
+          </p>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Модальные окна -->
+    <DeleteProjectModal
+      v-if="showDeleteModal"
+      :projectId="project.id"
+      :projectName="project.projectName"
+      @close="showDeleteModal = false"
+      @deleted="handleProjectDeleted"
+    />
+
+    <EditProjectModal
+      v-if="showEditModal"
+      :projectId="project.id"
+      :currentName="project.projectName"
+      :currentDescription="project.projectDescription"
+      @close="showEditModal = false"
+      @edited="handleProjectEdited"
+    />
+
+    <CreateTestCaseModal
+      v-if="showCreateTestCaseModal"
+      :projectId="project.id"
+      @close="showCreateTestCaseModal = false"
+    />
+
+        <!-- Кнопка назад -->
+    <div class="bottom-actions">
+      <button class="btn btn-back" @click="goBack">Назад</button>
+    </div>
+  </div>
 </template>
 
 <script>
-import CreateTestCaseModal from '@/components/CreateTestCaseModal.vue';
-import DeleteTestCaseModal from '@/components/DeleteTestCaseModal.vue';
-import { useRoute } from 'vue-router';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useProjectStore } from '@/stores/ProjectStore';
 import { useProjectDataStore } from '@/stores/ProjectDataStore';
+
+import DeleteProjectModal from '@/components/modal/project/DeleteProjectModal.vue';
+import EditProjectModal from '@/components/modal/project/EditProjectModal.vue';
+import CreateTestCaseModal from '@/components/modal/testCase/CreateTestCaseModal.vue';
 
 export default {
   name: 'ProjectDetail',
   components: {
+    DeleteProjectModal,
+    EditProjectModal,
     CreateTestCaseModal,
-    DeleteTestCaseModal,
   },
-  data() {
-    return {
-      projectId: null,
-      project: null,
-      testCases: [],
-      loading: true,
-      error: null,
-      showCreateTestCaseModal: false,
-      showDeleteTestCaseModal: false,
-    };
-  },
-  methods: {
-    async fetchProjectData() {
-      this.loading = true;
-      this.error = null;
-
-      try {
-        const projectStore = useProjectStore();
-        const dataStore = useProjectDataStore();
-
-        // Загружаем проект
-        await projectStore.fetchProjectById(this.projectId);
-        this.project = projectStore.projects[this.projectId];
-
-        // Загружаем тест-кейсы
-        await dataStore.loadTestCasesByProjectId(this.projectId);
-        this.testCases = dataStore.testCasesByProject[this.projectId] || [];
-      } catch (e) {
-        this.error = 'Ошибка загрузки данных проекта';
-        console.error(e);
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async handleCreateTestCase(testCaseData) {
-      try {
-        const dataStore = useProjectDataStore();
-
-        // Добавляем новый тест-кейс
-        await dataStore.createTestCase(this.projectId, testCaseData);
-
-        // Обновляем список тест-кейсов
-        await dataStore.loadTestCasesByProjectId(this.projectId);
-        this.testCases = dataStore.testCasesByProject[this.projectId] || [];
-
-        // Закрываем модалку
-        this.showCreateTestCaseModal = false;
-      } catch (error) {
-        console.error('Ошибка при создании тест-кейса:', error);
-      }
-    },
-
-    async handleDeleteTestCase(testCaseId) {
-      try {
-        const dataStore = useProjectDataStore();
-        console.log(`Попытка удалить this.projectId = ${this.projectId} testCaseId = ${testCaseId}`)
-        // Удаляем тест-кейс
-        await dataStore.deleteTestCase(this.projectId, testCaseId);
-
-        // Обновляем список тест-кейсов
-        await dataStore.loadTestCasesByProjectId(this.projectId);
-        this.testCases = dataStore.testCasesByProject[this.projectId] || [];
-
-        // Закрываем модалку
-        this.showDeleteTestCaseModal = false;
-      } catch (error) {
-        console.error('Ошибка при удалении тест-кейса:', error);
-      }
-    },
-    goToTestCaseDetail(projectId, testCaseId) {
-      console.log(`goToTestCaseDetail - projectId = ${projectId}, testCaseId = ${testCaseId}`)
-      this.$router.push({ name: 'TestCaseDetail', params: { projectId: projectId, testCaseId: testCaseId} });
-    },
-    goBack() {
-      this.$router.push(`/projects`);
-    },
-  },
-  mounted() {
+  setup() {
+    const router = useRouter();
     const route = useRoute();
-    this.projectId = route.params.projectId;
-    this.fetchProjectData();
+
+    const projectStore = useProjectStore();
+    const projectDataStore = useProjectDataStore();
+
+    const project = ref(null);
+    const loading = ref(false);
+    const error = ref(null);
+
+    const selectedFilter = ref('');
+    const searchQuery = ref('');
+
+    // Флаги для отображения модальных окон
+    const showDeleteModal = ref(false);
+    const showEditModal = ref(false);
+    const showCreateTestCaseModal = ref(false);
+
+    // Получаем projectId из параметров URL
+    const projectId = Number(route.params.projectId);
+
+    // Загружаем данные при монтировании
+    onMounted(async () => {
+      loading.value = true;
+      error.value = null;
+      try {
+        // 1) Загружаем/получаем из store сам проект
+        await projectStore.fetchProjectById(projectId);
+        project.value = projectStore.getProjectById(projectId);
+
+        // 2) Загружаем тест-кейсы проекта
+        await projectDataStore.loadTestCasesByProjectId(projectId);
+      } catch (err) {
+        error.value = err.message || 'Ошибка при загрузке проекта или тест-кейсов';
+        console.error('ProjectDetail - onMounted error:', err);
+      } finally {
+        loading.value = false;
+      }
+    });
+
+    // Список всех тест-кейсов для данного проекта
+    const testCasesForProject = computed(() => {
+      return projectDataStore.testCasesForProject(projectId);
+    });
+
+    // Поиск по имени или ID тест-кейса
+    const filteredTestCases = computed(() => {
+      if (!searchQuery.value.trim()) {
+        return testCasesForProject.value;
+      }
+      const query = searchQuery.value.toLowerCase();
+      return testCasesForProject.value.filter((testcase) => {
+        const matchName = testcase.testcaseName?.toLowerCase().includes(query);
+        const matchId = String(testcase.id).includes(query);
+        return matchName || matchId;
+      });
+    });
+
+    // Действия пользователя
+    const formatDate = (dateString) => {
+      // Простейший формат (YYYY-MM-DD или локальный):
+      if (!dateString) return '';
+      return new Date(dateString).toLocaleString();
+    };
+
+    const editProject = () => {
+      showEditModal.value = true;
+    };
+
+    const deleteProject = () => {
+      showDeleteModal.value = true;
+    };
+
+    const createTestCase = () => {
+      showCreateTestCaseModal.value = true;
+    };
+
+    const handleProjectDeleted = () => {
+      // После успешного удаления проекта перенаправляем на страницу со списком проектов
+      router.push('/projects');
+    };
+
+    const handleProjectEdited = (updatedProject) => {
+      // Обновляем локальное состояние 'project' с обновлёнными данными
+      project.value = updatedProject;
+      // Если необходимо, можно также обновить тест-кейсы или другие связанные данные
+      // Например:
+      // projectDataStore.loadTestCasesByProjectId(projectId);
+    };
+
+    const goToTestCaseDetail = (testCaseId) => {
+      router.push({
+        name: 'TestCaseDetail',
+        params: { projectId, testCaseId },
+      });
+    };
+
+    const goBack = () => {
+      router.push('/projects');
+    };
+
+    return {
+      project,
+      loading,
+      error,
+      selectedFilter,
+      searchQuery,
+      filteredTestCases,
+      formatDate,
+
+      // Флаги модальных окон
+      showDeleteModal,
+      showEditModal,
+      showCreateTestCaseModal,
+
+      // Методы
+      editProject,
+      deleteProject,
+      createTestCase,
+      handleProjectDeleted,
+      handleProjectEdited,
+      goToTestCaseDetail,
+      goBack,
+    };
   },
 };
 </script>
 
-<style scoped>
-/* Общие стили страницы */
-.project-detail {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: 'Arial', sans-serif;
-  background-color: #f8f9fa;
-  color: #333;
-}
-
-/* Заголовок */
-.project-header {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background-color: #292961;
-  color: white;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-.project-name {
-  font-size: 24px;
-  font-weight: bold;
-  margin: 0;
-}
-
-.project-description {
-  font-size: 14px;
-  color: #d0d0ff;
-  margin: 0;
-}
-
-/* Ошибка */
-.error-message {
-  color: #dc3545;
-  font-size: 14px;
-  margin-top: 20px;
-  text-align: center;
-}
-
-/* Кнопки */
-.button-container {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-button {
-  font-size: 12px;
-  font-weight: bold;
-  padding: 5px 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.create-testcase-button {
-  background-color: #28a745;
-  color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.create-testcase-button:hover {
-  background-color: #218838;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.delete-testcase-button {
-  background-color: #dc3545;
-  color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.delete-testcase-button:hover {
-  background-color: #c82333;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Список строк тест-кейсов */
-.testcase-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.testcase-row {
-  padding: 15px 20px;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-  cursor: pointer;
-}
-
-.testcase-row:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.testcase-content h3 {
-  font-size: 16px;
-  margin: 0 0 5px;
-  color: #292961;
-  font-weight: 600;
-}
-
-.testcase-content p {
-  margin: 0;
-  font-size: 14px;
-  color: #555;
-}
-
-/* Сообщение об отсутствии тест-кейсов */
-.no-testcases-message {
-  text-align: center;
-  font-size: 14px;
-  color: #888;
-  margin-top: 20px;
-}
-.back-button {
-  background-color: #6c757d;
-  color: white;
-}
-
-.back-button:hover {
-  background-color: #5a6268;
-}
-</style>

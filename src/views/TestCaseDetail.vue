@@ -1,175 +1,333 @@
+<!-- TestCaseDetail.vue -->
 <template>
-  <header class="testcase-detail">
-    <div class="testcase-header">
-      <h1 class="testcase-name">{{ testCase?.testcaseName || 'Название отсутствует' }}</h1>
-      <p class="testcase-description">{{ testCase?.testcaseDescription || 'Описание отсутствует' }}</p>
+  <div>
+    <!-- Состояние загрузки -->
+    <div v-if="loading" class="loading-container">
+      <p>Загрузка тест-кейса...</p>
     </div>
 
-    <!-- Индикация загрузки или ошибки -->
-    <div v-if="loading" class="loading">Загрузка данных тест-кейса...</div>
-    <div v-else-if="error" class="error-message">{{ error }}</div>
-    <div v-else>
-      <div class="testcase-info">
-        <p><strong>Проект:</strong> {{ projectId }}</p>
-        <p><strong>Тест-кейс ID:</strong> {{ testCaseId }}</p>
+    <!-- Состояние ошибки -->
+    <div v-else-if="error" class="error-container">
+      <p class="error-message">{{ error }}</p>
+      <button class="btn btn-back" @click="goBack">Назад</button>
+    </div>
+
+    <!-- Основной контент -->
+    <div v-else-if="testCase" class="page-container">
+      <!-- Заголовок с информацией о тест-кейсе -->
+      <div class="page-header">
+        <h1 class="page-title">
+          {{ testCase.testcaseName }}
+          <span class="page-id">(#{{ testCase.id }})</span>
+        </h1>
+        <p class="page-description">{{ testCase.testcaseDescription || 'Нет описания' }}</p>
+
+        <!-- Дата создания тест-кейса -->
+        <p class="page-created"> 
+          <span v-if="testCase.dateOfCreated">
+            {{ formatDate(testCase.dateOfCreated) }}
+          </span>
+          <span v-else>Неизвестно</span>
+        </p>
+
+        <div class="page-actions">
+          <!-- Блок кнопок (Редактировать/Удалить) -->
+          <button class="btn btn-edit" @click="showEditModal = true">Редактировать тест-кейс</button>
+          <button class="btn btn-delete" @click="showDeleteModal = true">Удалить тест-кейс</button>
+        </div>
       </div>
 
-      <!-- Кнопки действий -->
-      <div class="button-container">
-        <button class="edit-button">Редактировать</button>
-        <button class="delete-button">Удалить</button>
-        <button class="back-button" @click="goBack">Назад</button>
+      <!-- Блок действий (справа) -->
+      <div class="top-actions">
+        <!-- Кнопка создания шага -->
+        <button class="btn btn-create" @click="showCreateStepModal = true">
+          Создать шаг
+        </button>
+      </div>
+
+      <!-- Контейнер для списка шагов -->
+      <div class="list-container">
+        <h2>Шаги:</h2>
+        <ul class="list">
+          <li v-for="(step, index) in testCase.steps" :key="step.id || index" class="list-item">
+            <h3 class="item-title">Шаг {{ index + 1 }}:</h3>
+            <p class="item-desc"><strong>Действие:</strong> {{ step.step }}</p>
+            <p class="item-desc"><strong>Ожидаемый результат:</strong> {{ step.resultStep }}</p>
+            <!-- Кнопки для редактирования и удаления шага -->
+            <div class="step-actions">
+              <button class="btn btn-step-edit" @click="editStep(index)">Редактировать шаг</button>
+              <button class="btn btn-step-delete" @click="deleteStep(index)">Удалить шаг</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <!-- Кнопка назад -->
+      <div class="bottom-actions">
+          <button class="btn btn-back" @click="goBack">Назад</button>
       </div>
     </div>
-  </header>
+
+    <!-- Отображение, если тест-кейс не найден -->
+    <div v-else class="not-found-container">
+      <p>Тест-кейс не найден.</p>
+      <button class="btn btn-back" @click="goBack">Назад</button>
+    </div>
+
+    <!-- Модальные окна -->
+    <DeleteTestCaseModal
+      v-if="showDeleteModal"
+      :projectId="projectId"
+      :testCaseId="testCase.id"
+      :testCaseName="testCase.testcaseName"
+      @close="showDeleteModal = false"
+      @deleted="handleTestCaseDeleted"
+    />
+
+    <EditTestCaseModal
+      v-if="showEditModal"
+      :testCase="testCase"
+      @close="showEditModal = false"
+      @edited="handleTestCaseEdited"
+    />
+
+    <CreateStepModal
+      v-if="showCreateStepModal"
+      :testCaseId="testCase.id"
+      @close="showCreateStepModal = false"
+      @step-created="handleStepCreated"
+    />
+
+    <EditStepModal
+      v-if="showEditStepModal"
+      :testCaseId="testCase.id"
+      :step="currentStep"
+      :stepIndex="currentStepIndex"
+      @close="showEditStepModal = false"
+      @step-edited="handleStepEdited"
+    />
+
+    <DeleteStepModal
+      v-if="showDeleteStepModal"
+      :testCaseId="testCase.id"
+      :stepIndex="currentStepIndex"
+      @close="showDeleteStepModal = false"
+      @step-deleted="handleStepDeleted"
+    />
+  </div>
 </template>
 
 <script>
-import { useRoute } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useProjectDataStore } from '@/stores/ProjectDataStore';
+
+import DeleteTestCaseModal from '@/components/modal/testCase/DeleteTestCaseModal.vue';
+import EditTestCaseModal from '@/components/modal/testCase/EditTestCaseModal.vue';
+import CreateStepModal from '@/components/modal/step/CreateStepModal.vue';
+import EditStepModal from '@/components/modal/step/EditStepModal.vue';
+import DeleteStepModal from '@/components/modal/step/DeleteStepModal.vue';
 
 export default {
   name: 'TestCaseDetail',
-  data() {
-    return {
-      testCase: null,
-      loading: true,
-      error: null,
-      projectId: null,
-      testCaseId: null,
-    };
+  components: {
+    DeleteTestCaseModal,
+    EditTestCaseModal,
+    CreateStepModal,
+    EditStepModal,
+    DeleteStepModal,
   },
-  methods: {
-    async fetchTestCaseData() {
-      this.loading = true;
-      this.error = null;
-
-      try {
-        const projectDataStore = useProjectDataStore();
-        this.testCase = projectDataStore.getTestCaseById(Number(this.testCaseId));
-
-        if (!this.testCase) {
-          this.error = 'Тест-кейс не найден.';
-        }
-      } catch (e) {
-        this.error = 'Ошибка при загрузке данных тест-кейса.';
-        console.error(e);
-      } finally {
-        this.loading = false;
-      }
-    },
-    goBack() {
-      this.$router.push(`/projects/${this.projectId}`);
-    },
-  },
-  mounted() {
+  setup() {
+    const router = useRouter();
     const route = useRoute();
-    this.projectId = route.params.projectId;
-    this.testCaseId = route.params.testCaseId;
+    const projectDataStore = useProjectDataStore();
 
-    this.fetchTestCaseData();
+    const projectId = Number(route.params.projectId);
+    const testCaseId = Number(route.params.testCaseId);
+
+    const testCase = ref(null);
+    const loading = ref(false);
+    const error = ref(null);
+
+    // Флаги для отображения модальных окон
+    const showDeleteModal = ref(false);
+    const showEditModal = ref(false);
+    const showCreateStepModal = ref(false);
+    const showEditStepModal = ref(false);
+    const showDeleteStepModal = ref(false);
+
+    // Данные для редактирования или удаления шага
+    const currentStep = ref(null);
+    const currentStepIndex = ref(null);
+
+    // Метод для загрузки тест-кейса
+    const loadTestCase = async () => {
+      loading.value = true;
+      error.value = null;
+      try {
+        const fetched = await projectDataStore.fetchTestCaseById(testCaseId);
+        if (fetched) {
+          testCase.value = fetched;
+          console.log('Loaded TestCase:', testCase.value); // Для отладки
+        } else {
+          throw new Error('Тест-кейс не найден.');
+        }
+      } catch (err) {
+        error.value = err.message || 'Ошибка при загрузке тест-кейса.';
+        console.error('TestCaseDetail - loadTestCase error:', err);
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    // Метод для возврата на страницу проекта
+    const goBack = () => {
+      router.push(`/projects/${projectId}`);
+    };
+
+    // Обработчики событий для модальных окон
+    const handleTestCaseDeleted = () => {
+      // После успешного удаления тест-кейса перенаправляем на страницу проекта
+      router.push(`/projects/${projectId}`);
+    };
+
+    const handleTestCaseEdited = (updatedTestCase) => {
+      testCase.value = updatedTestCase;
+      // Можно добавить уведомление о успешном редактировании
+      // showToast('Тест-кейс успешно обновлён.');
+    };
+
+    const handleStepCreated = (newStep) => {
+      const updatedSteps = [
+        ...testCase.value.steps,
+        {
+          number: testCase.value.steps.length + 1,
+          step: newStep.step,
+          resultStep: newStep.resultStep,
+        },
+      ];
+      const updatedTestCaseData = {
+        testcaseName: testCase.value.testcaseName,
+        testcaseDescription: testCase.value.testcaseDescription,
+        steps: updatedSteps,
+      };
+      updateTestCase(updatedTestCaseData);
+    };
+
+    const editStep = (index) => {
+      currentStepIndex.value = index;
+      currentStep.value = { ...testCase.value.steps[index] };
+      showEditStepModal.value = true;
+    };
+
+    const handleStepEdited = (updatedStep) => {
+      const updatedSteps = [...testCase.value.steps];
+      updatedSteps[currentStepIndex.value] = {
+        ...updatedSteps[currentStepIndex.value],
+        step: updatedStep.step,
+        resultStep: updatedStep.resultStep,
+      };
+      const updatedTestCaseData = {
+        testcaseName: testCase.value.testcaseName,
+        testcaseDescription: testCase.value.testcaseDescription,
+        steps: updatedSteps.map((s, idx) => ({
+          number: idx + 1,
+          step: s.step,
+          resultStep: s.resultStep,
+        })),
+      };
+      updateTestCase(updatedTestCaseData);
+    };
+
+    const deleteStep = (index) => {
+      currentStepIndex.value = index;
+      showDeleteStepModal.value = true;
+    };
+
+    const handleStepDeleted = () => {
+      const updatedSteps = testCase.value.steps
+        .filter((_, idx) => idx !== currentStepIndex.value)
+        .map((s, idx) => ({
+          number: idx + 1,
+          step: s.step,
+          resultStep: s.resultStep,
+        }));
+      const updatedTestCaseData = {
+        testcaseName: testCase.value.testcaseName,
+        testcaseDescription: testCase.value.testcaseDescription,
+        steps: updatedSteps,
+      };
+      updateTestCase(updatedTestCaseData);
+    };
+
+    /**
+     * Метод для обновления тест-кейса с учётом изменений
+     * @param {Object} updatedTestCaseData - Объект с обновлёнными данными тест-кейса
+     */
+    const updateTestCase = async (updatedTestCaseData) => {
+      loading.value = true;
+      error.value = null;
+      try {
+        const updatedTestCase = await projectDataStore.updateTestCase(projectId, testCaseId, updatedTestCaseData);
+        if (updatedTestCase) {
+          testCase.value = updatedTestCase;
+          console.log('Updated TestCase:', testCase.value); // Для отладки
+          // Можно добавить уведомление о успешном обновлении
+          // showToast('Тест-кейс успешно обновлён.');
+        } else {
+          throw new Error('Не удалось обновить тест-кейс. Попробуйте ещё раз.');
+        }
+      } catch (err) {
+        error.value = err.message || 'Ошибка при обновлении тест-кейса.';
+        console.error('TestCaseDetail - updateTestCase error:', err);
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    /**
+     * Форматирование даты в удобочитаемый формат
+     * @param {String} dateString - Строка даты в формате ISO
+     * @returns {String} - Отформатированная дата
+     */
+    const formatDate = (dateString) => {
+      const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      return new Date(dateString).toLocaleDateString(undefined, options);
+    };
+
+    onMounted(() => {
+      loadTestCase();
+    });
+
+    return {
+      projectId,
+      testCase,
+      loading,
+      error,
+      goBack,
+
+      // Флаги модальных окон
+      showDeleteModal,
+      showEditModal,
+      showCreateStepModal,
+      showEditStepModal,
+      showDeleteStepModal,
+
+      // Данные для шага
+      currentStep,
+      currentStepIndex,
+
+      // Методы
+      handleTestCaseDeleted,
+      handleTestCaseEdited,
+      handleStepCreated,
+      editStep,
+      handleStepEdited,
+      deleteStep,
+      handleStepDeleted,
+      formatDate, // Добавляем метод форматирования даты
+    };
   },
 };
 </script>
 
-<style scoped>
-/* Общие стили страницы */
-.testcase-detail {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: 'Arial', sans-serif;
-  background-color: #f8f9fa;
-  color: #333;
-}
 
-/* Заголовок */
-.testcase-header {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background-color: #292961;
-  color: white;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-.testcase-name {
-  font-size: 24px;
-  font-weight: bold;
-  margin: 0;
-}
-
-.testcase-description {
-  font-size: 14px;
-  color: #d0d0ff;
-  margin: 0;
-}
-
-/* Ошибка */
-.error-message {
-  color: #dc3545;
-  font-size: 14px;
-  margin-top: 20px;
-  text-align: center;
-}
-
-/* Информация о тест-кейсе */
-.testcase-info {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-.testcase-info p {
-  font-size: 14px;
-  margin: 10px 0;
-}
-
-/* Кнопки действий */
-.button-container {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-button {
-  font-size: 12px;
-  font-weight: bold;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.edit-button {
-  background-color: #007bff;
-  color: white;
-}
-
-.edit-button:hover {
-  background-color: #0056b3;
-}
-
-.delete-button {
-  background-color: #dc3545;
-  color: white;
-}
-
-.delete-button:hover {
-  background-color: #c82333;
-}
-
-.back-button {
-  background-color: #6c757d;
-  color: white;
-}
-
-.back-button:hover {
-  background-color: #5a6268;
-}
-</style>
