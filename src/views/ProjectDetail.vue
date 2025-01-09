@@ -151,11 +151,9 @@ export default {
       loading.value = true;
       error.value = null;
       try {
-        // 1) Загружаем/получаем из store сам проект
         await projectStore.fetchProjectById(projectId);
         project.value = projectStore.getProjectById(projectId);
 
-        // 2) Загружаем тест-кейсы проекта
         await projectDataStore.loadTestCasesByProjectId(projectId);
       } catch (err) {
         error.value = err.message || 'Ошибка при загрузке проекта или тест-кейсов';
@@ -165,12 +163,10 @@ export default {
       }
     });
 
-    // Список всех тест-кейсов для данного проекта
     const testCasesForProject = computed(() => {
       return projectDataStore.testCasesForProject(projectId);
     });
 
-    // Поиск по имени или ID тест-кейса
     const filteredTestCases = computed(() => {
       if (!searchQuery.value.trim()) {
         return testCasesForProject.value;
@@ -183,9 +179,7 @@ export default {
       });
     });
 
-    // Действия пользователя
     const formatDate = (dateString) => {
-      // Простейший формат (YYYY-MM-DD или локальный):
       if (!dateString) return '';
       return new Date(dateString).toLocaleString();
     };
@@ -203,16 +197,11 @@ export default {
     };
 
     const handleProjectDeleted = () => {
-      // После успешного удаления проекта перенаправляем на страницу со списком проектов
       router.push('/projects');
     };
 
     const handleProjectEdited = (updatedProject) => {
-      // Обновляем локальное состояние 'project' с обновлёнными данными
       project.value = updatedProject;
-      // Если необходимо, можно также обновить тест-кейсы или другие связанные данные
-      // Например:
-      // projectDataStore.loadTestCasesByProjectId(projectId);
     };
 
     const goToTestCaseDetail = (testCaseId) => {

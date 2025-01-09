@@ -155,11 +155,9 @@ export default {
     const showEditStepModal = ref(false);
     const showDeleteStepModal = ref(false);
 
-    // Данные для редактирования или удаления шага
     const currentStep = ref(null);
     const currentStepIndex = ref(null);
 
-    // Метод для загрузки тест-кейса
     const loadTestCase = async () => {
       loading.value = true;
       error.value = null;
@@ -179,21 +177,16 @@ export default {
       }
     };
 
-    // Метод для возврата на страницу проекта
     const goBack = () => {
       router.push(`/projects/${projectId}`);
     };
 
-    // Обработчики событий для модальных окон
     const handleTestCaseDeleted = () => {
-      // После успешного удаления тест-кейса перенаправляем на страницу проекта
       router.push(`/projects/${projectId}`);
     };
 
     const handleTestCaseEdited = (updatedTestCase) => {
       testCase.value = updatedTestCase;
-      // Можно добавить уведомление о успешном редактировании
-      // showToast('Тест-кейс успешно обновлён.');
     };
 
     const handleStepCreated = (newStep) => {
@@ -270,9 +263,6 @@ export default {
         const updatedTestCase = await projectDataStore.updateTestCase(projectId, testCaseId, updatedTestCaseData);
         if (updatedTestCase) {
           testCase.value = updatedTestCase;
-          console.log('Updated TestCase:', testCase.value); // Для отладки
-          // Можно добавить уведомление о успешном обновлении
-          // showToast('Тест-кейс успешно обновлён.');
         } else {
           throw new Error('Не удалось обновить тест-кейс. Попробуйте ещё раз.');
         }
@@ -324,7 +314,7 @@ export default {
       handleStepEdited,
       deleteStep,
       handleStepDeleted,
-      formatDate, // Добавляем метод форматирования даты
+      formatDate,
     };
   },
 };

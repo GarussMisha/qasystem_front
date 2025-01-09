@@ -64,10 +64,10 @@ export default {
     const description = ref("");
     const loading = ref(false);
     const error = ref(null);
-    const textareaHeight = ref(100); // Начальная высота textarea
+    const textareaHeight = ref(100);
 
     const submitForm = async () => {
-      // Дополнительная валидация на уровне данных
+      //  валидация на уровне данных
       if (name.value.length > 64 || description.value.length > 255) {
         error.value = "Название или описание проекта не могут превышать 64 и 255 символов соответственно.";
         return;
@@ -77,24 +77,20 @@ export default {
       error.value = null;
 
       try {
-        // Вызов метода создания проекта из хранилища
         const newProject = await projectStore.createNewProject({
           name: name.value,
           description: description.value,
         });
 
         if (newProject) {
-          // Очистка полей формы
           name.value = "";
           description.value = "";
-          textareaHeight.value = 100; // Сброс высоты textarea
-          // Закрытие модального окна
+          textareaHeight.value = 100;
           emit("close");
         } else {
           error.value = "Не удалось создать проект. Попробуйте ещё раз.";
         }
       } catch (err) {
-        // Обработка ошибок
         error.value = err.message || "Произошла ошибка при создании проекта.";
         console.error("CreateProjectModal - submitForm error:", err);
       } finally {
@@ -103,17 +99,15 @@ export default {
     };
 
     const closeModal = () => {
-      if (!loading.value) { // Предотвращение закрытия во время загрузки
+      if (!loading.value) {
         emit("close");
-        // Очистка полей и ошибок при закрытии
         name.value = "";
         description.value = "";
-        textareaHeight.value = 100; // Сброс высоты textarea
+        textareaHeight.value = 100;
         error.value = null;
       }
     };
 
-    // Обработчик изменения размера textarea
     const onTextareaInput = (event) => {
       textareaHeight.value = event.target.scrollHeight;
     };
@@ -133,18 +127,17 @@ export default {
 </script>
 
 <style scoped>
-/* Общие стили */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(35, 0, 90, 0.5); /* Полупрозрачный фон для модального окна */
+  background-color: rgba(35, 0, 90, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000; /* Убедитесь, что модальное окно выше других элементов */
+  z-index: 1000;
 }
 
 .modal-content {
@@ -162,13 +155,13 @@ export default {
 
 .modal-content h2 {
   margin-bottom: 1.5rem;
-  color: #23005a; /* Соответствует цвету заголовка на ProjectList */
+  color: #23005a;
   text-align: center;
 }
 
 .form-group {
   margin-bottom: 1.5rem;
-  width: 100%; /* Убедитесь, что группа занимает всю ширину контейнера */
+  width: 100%;
 }
 
 .form-group label {
@@ -188,8 +181,8 @@ export default {
   box-sizing: border-box;
   color: #333;
   font-size: 1rem;
-  resize: vertical; /* Разрешаем только вертикальное изменение размера */
-  overflow: hidden; /* Скрываем горизонтальную прокрутку */
+  resize: vertical;
+  overflow: hidden;
 }
 
 .form-group input:focus,
@@ -213,7 +206,7 @@ export default {
 }
 
 .submit-button {
-  background-color: #28a745; /* зелёный (Bootstrap) */
+  background-color: #28a745;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -224,7 +217,7 @@ export default {
 }
 
 .submit-button:hover {
-  background-color: #218838; /* чуть темнее */
+  background-color: #218838;
 }
 
 .submit-button:disabled {
@@ -233,7 +226,7 @@ export default {
 }
 
 .cancel-button {
-  background-color: #dc3545; /* красный (Bootstrap) */
+  background-color: #dc3545;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -244,7 +237,7 @@ export default {
 }
 
 .cancel-button:hover {
-  background-color: #c82333; /* чуть темнее */
+  background-color: #c82333;
 }
 
 .cancel-button:disabled {
@@ -253,19 +246,17 @@ export default {
 }
 
 .error-message {
-  color: #dc3545; /* красный цвет для ошибок */
+  color: #dc3545;
   margin-bottom: 1rem;
   text-align: center;
   font-weight: 500;
 }
 
-/* Ограничение ширины для поля описания */
 .form-group textarea {
-  max-width: 100%; /* Убедитесь, что textarea не превышает ширину контейнера */
+  max-width: 100%;
   box-sizing: border-box;
 }
 
-/* Адаптивность для мобильных устройств */
 @media (max-width: 600px) {
   .modal-content {
     padding: 1.5rem;

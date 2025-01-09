@@ -42,7 +42,6 @@ export default {
   color: white;
 }
 
-/* Общий селектор для всех кнопок внутри HeadBar */
 .head-bar button {
   margin-right: 10px;
   margin-left: 10px;
@@ -63,28 +62,28 @@ export default {
 }
 
 .site-logo {
-    background-color: #23005a; /* Тёмно-фиолетовый фон */
-    color: #fff; /* Белый текст */
-    border: none; /* Убираем границы */
-    padding: 0.8rem 1.5rem; /* Внутренние отступы для красивой формы */
-    font-size: 1.5rem; /* Размер текста */
-    font-weight: bold; /* Жирный текст для акцента */
-    border-radius: 8px; /* Закруглённые углы */
-    cursor: pointer; /* Указывает, что это кнопка */
-    text-transform: uppercase; /* Все буквы заглавные */
-    letter-spacing: 1px; /* Расстояние между буквами */
-    transition: background-color 0.3s ease, transform 0.2s ease; /* Анимация */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тень для объёмного эффекта */
-}
+    background-color: #23005a;
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
 
-.site-logo:hover {
-    background-color: #370087; /* Более яркий оттенок при наведении */
-    transform: scale(1.05); /* Лёгкое увеличение при наведении */
-}
+  .site-logo:hover {
+    background-color: #370087;
+    transform: scale(1.05);
+  }
 
-.site-logo:active {
-    background-color: #170033; /* Темнее при нажатии */
-    transform: scale(0.95); /* Лёгкое уменьшение при нажатии */
+  .site-logo:active {
+    background-color: #170033;
+    transform: scale(0.95);
 }
 
 </style>

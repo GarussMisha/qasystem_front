@@ -111,7 +111,6 @@ export default {
     const error = ref(null);
 
     const submitForm = async () => {
-      // Валидация данных
       if (name.value.trim() === '') {
         error.value = 'Название тест-кейса обязательно.';
         return;
@@ -122,7 +121,6 @@ export default {
         return;
       }
 
-      // Валидация шагов
       for (const [index, step] of steps.value.entries()) {
         if (step.step.trim() === '' || step.resultStep.trim() === '') {
           error.value = `Шаг ${index + 1} должен содержать название и ожидаемый результат.`;
@@ -146,11 +144,8 @@ export default {
         const newTestCase = await projectDataStore.createTestCase(props.projectId, testCaseData);
 
         if (newTestCase) {
-          // Эмитируем событие для обновления списка тест-кейсов на странице
           emit('testcase-created', newTestCase);
-          // Закрываем модальное окно
           emit('close');
-          // Сброс формы
           resetForm();
         } else {
           error.value = 'Не удалось создать тест-кейс. Попробуйте ещё раз.';
@@ -177,12 +172,10 @@ export default {
       error.value = null;
     };
 
-    // Добавление нового шага
     const addStep = () => {
       steps.value.push({ step: '', resultStep: '' });
     };
 
-    // Удаление шага
     const removeStep = (index) => {
       steps.value.splice(index, 1);
     };
@@ -287,6 +280,7 @@ h2 {
   border-radius: 4px;
   cursor: pointer;
 }
+
 .remove-step:hover {
   background-color: #c82333;
 }
@@ -300,6 +294,7 @@ h2 {
   cursor: pointer;
   margin-top: 0.5rem;
 }
+
 .add-step:hover {
   background-color: #5a6268;
 }
@@ -318,7 +313,7 @@ h2 {
 }
 
 .submit-button {
-  background-color: #28a745; /* зелёный */
+  background-color: #28a745;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -327,9 +322,11 @@ h2 {
   font-weight: 500;
   transition: background-color 0.3s;
 }
+
 .submit-button:hover {
   background-color: #218838;
 }
+
 .submit-button:disabled {
   background-color: #94d3a2;
   cursor: not-allowed;
@@ -345,9 +342,11 @@ h2 {
   font-weight: 500;
   transition: background-color 0.3s;
 }
+
 .cancel-button:hover {
   background-color: #c82333;
 }
+
 .cancel-button:disabled {
   background-color: #e99a9f;
   cursor: not-allowed;

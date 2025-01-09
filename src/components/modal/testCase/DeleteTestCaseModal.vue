@@ -79,15 +79,13 @@ export default {
     const projectDataStore = useProjectDataStore();
     const loading = ref(false);
     const error = ref(null);
-    const confirmName = ref(''); // Для хранения ввода пользователя
-    const validationError = ref(null); // Для отображения ошибки валидации
+    const confirmName = ref('');
+    const validationError = ref(null);
 
-    // Вычисляемое свойство для проверки соответствия названий
     const isConfirmNameValid = computed(() => {
       return confirmName.value.trim() === props.testCaseName;
     });
 
-    // Следим за изменением confirmName и обновляем validationError
     watch(confirmName, (newVal) => {
       if (newVal === '') {
         validationError.value = null;
@@ -98,7 +96,6 @@ export default {
       }
     });
 
-    // Фокусировка на поле ввода при монтировании
     const confirmInput = ref(null);
     onMounted(() => {
       if (confirmInput.value) {
@@ -144,14 +141,13 @@ export default {
       isConfirmNameValid,
       deleteTestCase,
       closeModal,
-      confirmInput, // Для фокусировки
+      confirmInput,
     };
   },
 };
 </script>
 
 <style scoped>
-/* Стили модального окна */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -173,28 +169,25 @@ export default {
   max-width: 500px;
   box-sizing: border-box;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  
-  /* Предотвращение выделения текста */
-  -webkit-user-select: none; /* Safari */
-  -moz-user-select: none;    /* Firefox */
-  -ms-user-select: none;     /* IE10+/Edge */
-  user-select: none;         /* Стандартное свойство */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
-/* Разрешить выделение текста внутри полей ввода и кнопок */
 .confirmation-group input,
 .confirmation-group input::placeholder,
 button {
-  -webkit-user-select: text; /* Safari */
-  -moz-user-select: text;    /* Firefox */
-  -ms-user-select: text;     /* IE10+/Edge */
-  user-select: text;         /* Стандартное свойство */
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 
 h2 {
   margin-bottom: 1rem;
   text-align: center;
-  color: #dc3545; /* Красный цвет для акцента на удалении */
+  color: #dc3545;
 }
 
 .warning-text {
@@ -242,7 +235,7 @@ h2 {
 }
 
 .btn-confirm {
-  background-color: #dc3545; /* Красный */
+  background-color: #dc3545;
   color: #fff;
   border: none;
   padding: 0.6rem 1.5rem;
@@ -254,13 +247,14 @@ h2 {
 .btn-confirm:hover {
   background-color: #c82333;
 }
+
 .btn-confirm:disabled {
   background-color: #e99a9f;
   cursor: not-allowed;
 }
 
 .btn-cancel {
-  background-color: #6c757d; /* Серый */
+  background-color: #6c757d;
   color: #fff;
   border: none;
   padding: 0.6rem 1.5rem;
@@ -269,9 +263,11 @@ h2 {
   font-weight: 500;
   transition: background-color 0.3s;
 }
+
 .btn-cancel:hover {
   background-color: #5a6268;
 }
+
 .btn-cancel:disabled {
   background-color: #a6a6a6;
   cursor: not-allowed;

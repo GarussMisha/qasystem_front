@@ -73,15 +73,13 @@ export default {
 
     const loading = ref(false);
     const error = ref(null);
-    const confirmName = ref(''); // Новая переменная для хранения ввода пользователя
-    const validationError = ref(null); // Для отображения ошибки валидации
+    const confirmName = ref('');
+    const validationError = ref(null);
 
-    // Вычисляемое свойство для проверки соответствия названий
     const isConfirmNameValid = computed(() => {
       return confirmName.value.trim() === props.projectName;
     });
 
-    // Следим за изменением confirmName и обновляем validationError
     watch(confirmName, (newVal) => {
       if (newVal === '') {
         validationError.value = null;
@@ -103,9 +101,8 @@ export default {
       try {
         const result = await projectStore.deleteProject(props.projectId);
         if (result) {
-          // Успешно удален
-          emit('deleted'); // Эмитируем событие 'deleted'
-          emit('close'); // Закрываем модальное окно
+          emit('deleted');
+          emit('close');
         } else {
           error.value = 'Не удалось удалить проект. Попробуйте ещё раз.';
         }
@@ -155,32 +152,28 @@ export default {
   padding: 1.5rem 2rem;
   border-radius: 12px;
   width: 90%;
-  max-width: 500px; /* Увеличено для размещения поля ввода */
+  max-width: 500px;
   box-sizing: border-box;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  
-  /* Добавлено свойство для предотвращения выделения текста */
-  -webkit-user-select: none; /* Safari */
-  -moz-user-select: none;    /* Firefox */
-  -ms-user-select: none;     /* IE10+/Edge */
-  user-select: none;         /* Стандартное свойство */
+  -webkit-user-select: none; 
+  -moz-user-select: none;    
+  -ms-user-select: none;     
+  user-select: none;
 }
 
-/* Разрешить выделение текста внутри полей ввода и кнопок */
 .confirmation-group input,
 .confirmation-group input::placeholder,
 button {
-  -webkit-user-select: text; /* Safari */
-  -moz-user-select: text;    /* Firefox */
-  -ms-user-select: text;     /* IE10+/Edge */
-  user-select: text;         /* Стандартное свойство */
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 
-/* Дополнительные стили */
 h2 {
   margin-bottom: 1rem;
   text-align: center;
-  color: #dc3545; /* Изменен цвет для акцента на удалении */
+  color: #dc3545;
 }
 
 .warning-text {
@@ -237,9 +230,11 @@ h2 {
   font-weight: 500;
   transition: background-color 0.3s;
 }
+
 .submit-button:hover {
   background-color: #c82333;
 }
+
 .submit-button:disabled {
   background-color: #f19696;
   cursor: not-allowed;
@@ -255,9 +250,11 @@ h2 {
   font-weight: 500;
   transition: background-color 0.3s;
 }
+
 .cancel-button:hover {
   background-color: #5a6268;
 }
+
 .cancel-button:disabled {
   background-color: #bbb;
   cursor: not-allowed;

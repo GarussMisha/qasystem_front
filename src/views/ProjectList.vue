@@ -95,7 +95,6 @@ export default {
       await projectStore.loadAllProjects(true);
     });
 
-    // Фильтрация: только по имени или по ID
     const filteredProjects = computed(() => {
       const query = searchQuery.value.trim().toLowerCase();
       if (!query) {
@@ -108,12 +107,10 @@ export default {
       });
     });
 
-    // Переход на детальную страницу проекта
     const goToProjectDetail = (projectId) => {
       router.push({ name: 'ProjectDetail', params: { projectId } });
     };
 
-    // Возврат на главную
     const goBack = () => {
       router.push('/');
     };

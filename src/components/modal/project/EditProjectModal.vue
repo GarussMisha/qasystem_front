@@ -79,7 +79,6 @@ export default {
     const error = ref(null);
 
     const submitForm = async () => {
-      // Дополнительная валидация на уровне данных
       if (editedName.value.length > 64 || editedDescription.value.length > 255) {
         error.value = 'Название или описание проекта превышает максимально допустимую длину.';
         return;
@@ -93,8 +92,8 @@ export default {
           projectDescription: editedDescription.value,
         });
         if (updatedProject) {
-          emit('edited', updatedProject); // Эмитируем событие 'edited' с обновлённым проектом
-          emit('close'); // Закрываем модальное окно
+          emit('edited', updatedProject);
+          emit('close');
         } else {
           error.value = 'Не удалось сохранить изменения. Попробуйте ещё раз.';
         }
@@ -209,9 +208,11 @@ h2 {
   font-weight: 500;
   transition: background-color 0.3s;
 }
+
 .submit-button:hover {
   background-color: #5a32a3; 
 }
+
 .submit-button:disabled {
   background-color: #9a7dbf;
   cursor: not-allowed;
@@ -227,9 +228,11 @@ h2 {
   font-weight: 500;
   transition: background-color 0.3s;
 }
+
 .cancel-button:hover {
   background-color: #5a6268;
 }
+
 .cancel-button:disabled {
   background-color: #bbb;
   cursor: not-allowed;

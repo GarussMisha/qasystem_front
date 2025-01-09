@@ -49,15 +49,13 @@ export default {
     const projectStore = useProjectStore();
     const testCaseStore = useProjectDataStore();
 
-    // Вычисляемое свойство для projectName
     const projectName = computed(() => {
       const projectId = parseInt(route.params.projectId, 10);
       const project = projectStore.getProjectById(projectId);
       return project?.projectName || `Проект ${projectId}`;
     });
 
-    // Вычисляемое свойство для testCaseName
-    const testCaseName = computed(() => {
+      const testCaseName = computed(() => {
       const testCaseId = parseInt(route.params.testCaseId, 10);
       const testCase = testCaseStore.getTestCaseById(testCaseId);
       return testCase?.testcaseName || `Тест-кейс ${testCaseId}`;

@@ -70,7 +70,6 @@
       const error = ref(null);
   
       const submitForm = async () => {
-        // Валидация данных
         if (name.value.trim() === '') {
           error.value = 'Название тест-кейса обязательно.';
           return;
@@ -89,7 +88,7 @@
           const updateData = {
             testcaseName: name.value.trim(),
             testcaseDescription: description.value.trim(),
-            steps: steps.value, // Добавляем steps в updateData
+            steps: steps.value,
           };
           const success = await projectDataStore.updateTestCase(
             props.testCase.project,
@@ -98,9 +97,7 @@
           );
   
           if (success) {
-            // Эмитируем событие для обновления данных на странице
             emit('edited', { ...props.testCase, ...updateData });
-            // Закрываем модальное окно
             emit('close');
           } else {
             throw new Error('Не удалось обновить тест-кейс. Попробуйте ещё раз.');
@@ -209,7 +206,7 @@
   }
   
   .submit-button {
-    background-color: #28a745; /* зелёный */
+    background-color: #28a745;
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -218,9 +215,11 @@
     font-weight: 500;
     transition: background-color 0.3s;
   }
+
   .submit-button:hover {
     background-color: #218838;
   }
+
   .submit-button:disabled {
     background-color: #94d3a2;
     cursor: not-allowed;
@@ -236,9 +235,11 @@
     font-weight: 500;
     transition: background-color 0.3s;
   }
+
   .cancel-button:hover {
     background-color: #c82333;
   }
+  
   .cancel-button:disabled {
     background-color: #e99a9f;
     cursor: not-allowed;

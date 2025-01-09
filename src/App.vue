@@ -1,7 +1,6 @@
 <template>
   <div id="app">
     <HeadBar />
-    
     <SideMenu @toggle="handleSideMenuToggle" />
     <div class="content" :style="{ marginLeft: contentMargiLeft }">
       <PathBar />
@@ -18,8 +17,8 @@ import PathBar from '@/components/PathBar.vue';
 export default {
   name: 'App',
   components: {
-    HeadBar, // Регестрируем HeadBar
-    SideMenu, // Регестрируем SideMenu
+    HeadBar,
+    SideMenu,
     PathBar,
   },
   data() {
@@ -44,17 +43,15 @@ export default {
 /* Подключение шрифта через Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-
-/* Убираем отступы в проекте. */
 body, html { 
   margin: 0; 
   padding: 0;
-  font-family: 'Roboto', sans-serif; /* Устанавливаем шрифт по умолчанию */
+  font-family: 'Roboto', sans-serif;
   font-weight: 700;
 }
 
 :root {
-  --header-height: 60px; /* Высота HeadBar */
+  --header-height: 60px;
 }
 
 #app {
@@ -65,10 +62,7 @@ body, html {
 }
 
 .content {
-  transition: margin-left 0.5s ease; /* Плавное изменение отступа от SideMenu*/
-  padding-top: var(--header-height); /* Добавляем отступ сверху */
+  transition: margin-left 0.5s ease;
+  padding-top: var(--header-height);
 }
-
-
-
 </style>
