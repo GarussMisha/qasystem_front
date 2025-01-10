@@ -58,32 +58,32 @@ export default {
 }
 
 .head-bar button:hover {
-    background-color: #e3e3e3;
+  background-color: #e3e3e3;
 }
 
 .site-logo {
-    background-color: #23005a;
-    color: #fff;
-    border: none;
-    padding: 0.8rem 1.5rem;
-    font-size: 1.5rem;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
+  background-color: #23005a;
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 
-  .site-logo:hover {
-    background-color: #370087;
-    transform: scale(1.05);
-  }
+.site-logo:hover {
+  background-color: #370087;
+  transform: scale(1.05);
+}
 
-  .site-logo:active {
-    background-color: #170033;
-    transform: scale(0.95);
+.site-logo:active {
+  background-color: #170033;
+  transform: scale(0.95);
 }
 
 </style>

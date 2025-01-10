@@ -43,7 +43,7 @@
   margin: 0 auto;
   padding: 20px;
   font-family: 'Arial', sans-serif;
-  background-color: #f8f9fa;
+  background-color: #ffffff;
   color: #333;
 }
 

@@ -4,8 +4,8 @@
     <div class="modal-content" @click.stop>
       <h2>Удалить проект</h2>
       <p class="warning-text">
-        Вы действительно хотите удалить проект "<strong>{{ projectName }}</strong>"?
-        <br />
+        Вы действительно хотите удалить проект <br />
+        "<strong>{{ projectName }}</strong>"?<br />
         Это действие нельзя будет отменить.
       </p>
 

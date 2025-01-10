@@ -1,16 +1,14 @@
 <template>
   <div class="home-page">
     <div class="home-container">
-      <!-- Первый блок - Информация о пользователе -->
       <div class="user-info">
-        <h2>Информация о пользователе</h2>
-        <p>Здесь будет отображаться информация о текущем пользователе: имя, роль, статус и другая важная информация.</p>
+        <h2>Информация, связанная с пользователем</h2>
+        <p>Срок выполнения задач. Какие задачи стоит выполнить в первую очередь по приоритету. Просроченные задачи. Задачи в планах.</p>
       </div>
 
-      <!-- Второй блок - Обновления сайта -->
       <div class="site-updates">
-        <h2>Обновления сайта</h2>
-        <p>На этой панели отображаются последние обновления и новости портала. Ознакомьтесь с новым функционалом и улучшениями.</p>
+        <h2>Обновления</h2>
+        <p>Последние обновления в проектах на которые подписан пользователь.</p>
       </div>
     </div>
   </div>
@@ -27,9 +25,8 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f6f6f6;
-  min-height: 100vh;
-  padding: 20px;
+  background-color: #ffffff;
+  padding: 40px;
   box-sizing: border-box;
 }
 
@@ -49,6 +46,7 @@ export default {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
+  height: 80vh;
 }
 
 .site-updates {
@@ -59,5 +57,6 @@ export default {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
+  height: 80vh;
 }
 </style>
