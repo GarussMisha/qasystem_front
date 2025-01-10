@@ -435,5 +435,4 @@ export {
   deleteTestCaseById
 };
 
-// Экспорт по умолчанию — сам apiClient, если где-то нужен axios с этими настройками
 export default apiClient;
