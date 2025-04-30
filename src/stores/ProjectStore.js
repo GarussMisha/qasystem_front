@@ -6,7 +6,7 @@ import {
   getProjectById,
   deleteProjectById,
   updateProjectById,
-} from '@/api/api';
+} from '@/api/project.api';
 import { useProjectDataStore } from '@/stores/ProjectDataStore';
 
 export const useProjectStore = defineStore('projectsStore', {

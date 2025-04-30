@@ -7,10 +7,11 @@
     </button>
 
     <!-- Кнопки меню -->
-    <div class="menu-buttons">
+    <div class="menu-buttons" :style="{ pointerEvents: isExpanded ? 'auto' : 'none' }">
       <button @click="goToInfo" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.4s ease' }">Информация</button>
       <button @click="goToProfile" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.4s ease' }">Профиль</button>
       <button @click="goToProjectList" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.4s ease' }">Проекты</button>
+      <button @click="goToDebugPage" :style="{ opacity: isExpanded ? 1 : 0, transition: 'opacity 0.4s ease' }">Дебаг панель</button>
     </div>
   </div>
 </template>
@@ -36,6 +37,9 @@ export default {
     },
     goToProjectList() {
       this.$router.push({ name: 'ProjectList' });
+    },
+    goToDebugPage() {
+      this.$router.push({ name: 'DebugPage'});
     },
   }
 };

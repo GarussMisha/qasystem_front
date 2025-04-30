@@ -7,6 +7,7 @@ import ProjectDetail from '@/views/ProjectDetail.vue';
 import InfoPage from "./views/InfoPage.vue";
 import ProfilePage from "./views/ProfilePage.vue";
 import TestCaseDetail from '@/views/TestCaseDetail.vue';
+import DebugPage from "./views/DebugPage.vue";
 
 
 // Определяем паршруты
@@ -40,6 +41,12 @@ const routes = [
         path: '/projects/:projectId/testcase/:testCaseId',
         name: 'TestCaseDetail',
         component: TestCaseDetail,
+    },
+    //Страница проверки запросов к беку
+    {
+        path: '/debug',
+        name: 'DebugPage',
+        component: DebugPage,
     },
 ];
 

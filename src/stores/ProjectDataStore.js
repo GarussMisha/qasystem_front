@@ -7,7 +7,7 @@ import {
   getAllTestCaseByProjectId,
   updateTestCaseById,
   deleteTestCaseById,
-} from '@/api/api';
+} from '@/api/project.api';
 
 export const useProjectDataStore = defineStore('projectDataStore', {
   state: () => ({
