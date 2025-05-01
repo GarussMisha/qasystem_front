@@ -62,7 +62,7 @@ body, html {
 }
 
 .content {
-  transition: margin-left 0.5s ease;
+  transition: margin-left 0.4s ease;
   padding-top: var(--header-height);
 }
 </style>
