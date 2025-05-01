@@ -50,7 +50,6 @@ export default {
   --transition: 0.4s ease;
   
   position: fixed;
-  top: 60px;
   left: 0;
   width: var(--width-collapsed);
   height: calc(100vh - 60px);

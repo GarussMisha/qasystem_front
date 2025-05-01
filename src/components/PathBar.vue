@@ -128,7 +128,7 @@ export default {
   display: flex;
   align-items: center;
   padding: 10px 20px;
-  background-color: #292961;
+  background-color: #adadef;
   color: white;
   font-size: 14px;
   font-weight: bold;
@@ -141,13 +141,12 @@ export default {
 }
 
 .breadcrumb-link {
-  color: white;
+  color: rgb(0, 7, 77);
   text-decoration: none;
   cursor: pointer;
 }
 
 .breadcrumb-link.active {
   cursor: default;
-  text-decoration: underline;
 }
 </style>

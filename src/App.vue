@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <HeadBar />
     <SideMenu @toggle="handleSideMenuToggle" />
     <div class="content" :style="{ marginLeft: contentMargiLeft }">
       <PathBar />
@@ -10,14 +9,12 @@
 </template>
 
 <script>
-import HeadBar from '@/components/HeadBar.vue';
 import SideMenu from '@/components/SideMenu.vue';
 import PathBar from '@/components/PathBar.vue';
 
 export default {
   name: 'App',
   components: {
-    HeadBar,
     SideMenu,
     PathBar,
   },
@@ -50,9 +47,6 @@ body, html {
   height: 100%; /* Убедимся, что html и body занимают всю высоту */
 }
 
-:root {
-  --header-height: 60px;
-}
 
 #app {
   font-family: 'Roboto', sans-serif;
