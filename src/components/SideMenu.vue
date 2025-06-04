@@ -27,6 +27,7 @@ export default {
     return {
       isExpanded: false,
       menuItems: [
+        { name: 'Главная страница', icon: 'icon-home', route: 'Home' },
         { name: 'Информация', icon: 'icon-info', route: 'InfoPage' },
         { name: 'Проекты', icon: 'icon-projects', route: 'ProjectList' },
         { name: 'Дебаг панель', icon: 'icon-debug', route: 'DebugPage' },
@@ -52,9 +53,9 @@ export default {
   position: fixed;
   left: 0;
   width: var(--width-collapsed);
-  height: calc(100vh - 60px);
-  background: #fff;
-  border-right: 1px solid #eee;
+  height: calc(100vh - 0px);
+  background: #8577ffac;
+  border-right: 0.1px solid #303030;
   transition: width var(--transition);
   z-index: 1000;
   overflow: hidden;
@@ -91,11 +92,11 @@ export default {
 }
 
 .nav-item:hover {
-  background: #f5f5f5;
+  background: #b9b2f8ec;
 }
 
 .nav-item.active {
-  background: #e3e3e3;
+  background: #8f82feec;
 }
 
 .nav-icon {
@@ -103,7 +104,6 @@ export default {
   width: 24px;
   height: 24px;
   margin-right: 16px;
-  /* Добавьте свои иконки через background-image или используйте иконочный шрифт */
 }
 
 .nav-text {
@@ -131,18 +131,21 @@ export default {
   margin-left: 10px;
 }
 
-/* Состояния для развернутого меню */
 .expanded .nav-text {
   opacity: 1;
   transform: translateX(0);
 }
 
-/* Показывать tooltip только в свернутом состоянии */
 .side-menu:not(.expanded) .nav-item:hover .nav-tooltip {
   opacity: 1;
 }
 
 /* Иконки меню */
+.icon-home{
+  background: url('@/assets/icons/home.svg') no-repeat center;
+  background-size: contain;
+}
+
 .icon-info{
   background: url('@/assets/icons/info.svg') no-repeat center;
   background-size: contain;
@@ -178,12 +181,10 @@ export default {
   transition: transform 0.2s;
 }
 
-
-/* Добавьте эти стили для иконки переключения */
 .toggle-btn .icon {
   display: block;
   width: 20px;
   height: 20px;
-  min-width: 20px; /* Защита от сжатия */
+  min-width: 20px;
 }
 </style>

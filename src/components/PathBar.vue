@@ -1,152 +1,158 @@
+<!-- File: src/components/PathBar.vue -->
 <template>
   <header class="path-bar" v-if="showPathBar">
-    <div class="path-text">
-      <!-- Хлебные крошки -->
-      <router-link
-        v-if="breadcrumbParts.projects"
-        :to="{ path: '/projects' }"
-        class="breadcrumb-link"
-        :class="{ active: isCurrentRoute('/projects') }"
-        @click.prevent="navigateTo('/projects')"
+    <nav class="breadcrumb">
+      <span
+        v-for="(crumb, index) in breadcrumbs"
+        :key="index"
+        class="crumb"
       >
-        Проекты
-      </router-link>
-      <span v-if="breadcrumbParts.projects && breadcrumbParts.projectName"> > </span>
-      <router-link
-        v-if="breadcrumbParts.projectName"
-        :to="{ path: `/projects/${breadcrumbParts.projectId}` }"
-        class="breadcrumb-link"
-        :class="{ active: isCurrentRoute(`/projects/${breadcrumbParts.projectId}`) }"
-        @click.prevent="navigateTo(`/projects/${breadcrumbParts.projectId}`)"
-      >
-        {{ breadcrumbParts.projectName }}
-      </router-link>
-      <span v-if="breadcrumbParts.projectName && breadcrumbParts.testCaseName"> > </span>
-      <router-link
-        v-if="breadcrumbParts.testCaseName"
-        :to="{ path: `/projects/${breadcrumbParts.projectId}/testcase/${breadcrumbParts.testCaseId}` }"
-        class="breadcrumb-link"
-        :class="{ active: isCurrentRoute(`/projects/${breadcrumbParts.projectId}/testcase/${breadcrumbParts.testCaseId}`) }"
-        @click.prevent="navigateTo(`/projects/${breadcrumbParts.projectId}/testcase/${breadcrumbParts.testCaseId}`)"
-      >
-        {{ breadcrumbParts.testCaseName }}
-      </router-link>
-    </div>
+        <router-link
+          v-if="crumb.to"
+          :to="crumb.to"
+          class="crumb-link"
+        >
+          {{ crumb.text }}
+        </router-link>
+        <span v-else class="crumb-text">{{ crumb.text }}</span>
+
+        <!-- Разделитель, если не последний элемент -->
+        <span v-if="index < breadcrumbs.length - 1" class="crumb-sep">/</span>
+      </span>
+    </nav>
   </header>
 </template>
 
-<script>
-import { computed, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useProjectStore } from '@/stores/ProjectStore';
-import { useProjectDataStore } from '@/stores/ProjectDataStore';
+<script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { currentPathTitle } from '@/store/pathTitle'
 
-export default {
-  name: 'PathBar',
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-    const projectStore = useProjectStore();
-    const testCaseStore = useProjectDataStore();
+const pathMap = {
+  '/': 'Главная',
+  '/info': 'Инфо',
+  '/projects': 'Проекты',
+  '/debug': 'Дебаг',
+  '/profile': 'Профиль'
+}
 
-    const projectName = computed(() => {
-      const projectId = parseInt(route.params.projectId, 10);
-      const project = projectStore.getProjectById(projectId);
-      return project?.projectName || `Проект ${projectId}`;
-    });
+const route = useRoute()
 
-      const testCaseName = computed(() => {
-      const testCaseId = parseInt(route.params.testCaseId, 10);
-      const testCase = testCaseStore.getTestCaseById(testCaseId);
-      return testCase?.testcaseName || `Тест-кейс ${testCaseId}`;
-    });
+const breadcrumbs = computed(() => {
+  const crumbs = []
+  const { params, path, name, meta } = route
 
-    // Отображение PathBar
-    const showPathBar = computed(() => {
-      const hiddenPaths = ['/', '/profile', '/info'];
-      return !hiddenPaths.includes(route.path);
-    });
+  if (path in pathMap && !params.projectId && !params.testCaseId && !params.checkListId) {
+    crumbs.push({ text: pathMap[path], to: { path } })
+    return crumbs
+  }
 
-    // Формирование хлебных крошек
-    const breadcrumbParts = computed(() => {
-      const parts = { projects: true };
+  if (path === '/projects') {
+    crumbs.push({ text: pathMap['/projects'], to: { name: 'ProjectList' } })
+    return crumbs
+  }
 
-      if (route.path.startsWith('/projects/') && route.params.projectId) {
-        const projectId = route.params.projectId;
-        parts.projectId = projectId;
-        parts.projectName = projectName.value;
+  if (name === 'ProjectDetail') {
+    const projectName = currentPathTitle.value || `Проект #${params.projectId}`
+    crumbs.push({ text: 'Проекты', to: { name: 'ProjectList' } })
+    crumbs.push({
+      text: projectName,
+      to: { name: 'ProjectDetail', params: { projectId: params.projectId } }
+    })
+    return crumbs
+  }
+
+  if (params.projectId && params.testCaseId && path.includes('/testcases/')) {
+    const projectName = meta.projectName || `Проект #${params.projectId}`
+
+    crumbs.push({ text: 'Проекты', to: { name: 'ProjectList' } })
+    crumbs.push({
+      text: projectName,
+      to: { name: 'ProjectDetail', params: { projectId: params.projectId } }
+    })
+    crumbs.push({
+      text: 'Тест-кейсы',
+      to: {
+        name: 'ProjectDetail',
+        params: { projectId: params.projectId },
+        query: { tab: 'testcases' }
       }
+    })
+    crumbs.push({
+      text: currentPathTitle.value || `ТК #${params.testCaseId}`,
+      to: null
+    })
+    return crumbs
+  }
 
-      if (route.path.includes('/testcase/') && route.params.testCaseId) {
-        const testCaseId = route.params.testCaseId;
-        parts.testCaseId = testCaseId;
-        parts.testCaseName = testCaseName.value;
+  if (params.projectId && params.checkListId && path.includes('/checklists/')) {
+    const projectName = meta.projectName || `Проект #${params.projectId}`
+
+    crumbs.push({ text: 'Проекты', to: { name: 'ProjectList' } })
+    crumbs.push({
+      text: projectName,
+      to: { name: 'ProjectDetail', params: { projectId: params.projectId } }
+    })
+    crumbs.push({
+      text: 'Чек-листы',
+      to: {
+        name: 'ProjectDetail',
+        params: { projectId: params.projectId },
+        query: { tab: 'checklists' }
       }
+    })
+    crumbs.push({
+      text: currentPathTitle.value || `ЧЛ #${params.checkListId}`,
+      to: null
+    })
+    return crumbs
+  }
 
-      return parts;
-    });
+  if (currentPathTitle.value) {
+    crumbs.push({ text: currentPathTitle.value, to: null })
+  } else {
+    crumbs.push({ text: 'Неизвестная страница', to: null })
+  }
+  return crumbs
+})
 
-    // Проверка текущего маршрута
-    const isCurrentRoute = (path) => route.path === path;
-
-    // Навигация по клику
-    const navigateTo = (path) => {
-      if (!isCurrentRoute(path)) {
-        router.push(path);
-      }
-    };
-
-    // Обновление данных при изменении маршрута
-    const updateBreadcrumbs = async () => {
-      const projectId = route.params.projectId;
-      if (projectId) {
-        await projectStore.fetchProjectById(parseInt(projectId, 10));
-      }
-
-      const testCaseId = route.params.testCaseId;
-      if (testCaseId) {
-        await testCaseStore.fetchTestCaseById(parseInt(testCaseId, 10));
-      }
-    };
-
-    onMounted(updateBreadcrumbs);
-    watch(() => route.path, updateBreadcrumbs);
-
-    return {
-      showPathBar,
-      breadcrumbParts,
-      isCurrentRoute,
-      navigateTo,
-    };
-  },
-};
+const showPathBar = computed(() => true)
 </script>
-
 
 <style scoped>
 .path-bar {
+  background-color: #f5f5f5;
+  padding: 10px 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.breadcrumb {
+  display: flex;
+  gap: 4px;
+  font-size: 14px;
+  color: #333;
+  font-family: Arial, sans-serif;
+}
+
+.crumb {
   display: flex;
   align-items: center;
-  padding: 10px 20px;
-  background-color: #adadef;
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-  box-shadow: 0 2px 4px rgb(255, 255, 255);
 }
 
-.path-text {
-  display: flex;
-  gap: 5px;
-}
-
-.breadcrumb-link {
-  color: rgb(0, 7, 77);
+.crumb-link {
+  color: #007bff;
   text-decoration: none;
-  cursor: pointer;
+}
+.crumb-link:hover {
+  text-decoration: underline;
 }
 
-.breadcrumb-link.active {
-  cursor: default;
+.crumb-text {
+  color: #333;
+}
+
+.crumb-sep {
+  margin: 0 4px;
+  color: #666;
 }
 </style>

@@ -1,51 +1,43 @@
-<!-- DeleteProjectModal.vue -->
+<!-- File: src/components/modal/project/DeleteProjectModal.vue -->
 <template>
-  <div class="modal-overlay" @mousedown.self="closeModal">
-    <div class="modal-content" @click.stop>
-      <h2>Удалить проект</h2>
-      <p class="warning-text">
-        Вы действительно хотите удалить проект <br />
-        "<strong>{{ projectName }}</strong>"?<br />
-        Это действие нельзя будет отменить.
-      </p>
-
-      <!-- Поле ввода для подтверждения названия проекта -->
-      <div class="confirmation-group">
-        <label for="confirmName">Введите название проекта для подтверждения:</label>
-        <input
-          id="confirmName"
-          v-model="confirmName"
-          type="text"
-          maxlength="64"
-          required
-          placeholder="Введите название проекта"
-        />
+  <div class="modal-overlay" @mousedown.self="close">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Подтверждение удаления</h3>
+        <button class="modal-close" @click="close">&times;</button>
       </div>
-
-      <!-- Ошибка, если названия не совпадают -->
-      <div v-if="validationError" class="error-message">
-        {{ validationError }}
+      
+      <div class="modal-body">
+        <p>Вы собираетесь удалить проект: <strong>{{ projectName }}</strong></p>
+        <p>Это действие невозможно отменить. Все связанные тест-кейсы и чек-листы будут удалены.</p>
+        
+        <div class="confirmation-input">
+          <label for="projectNameInput">
+            Введите название проекта для подтверждения:
+          </label>
+          <input
+            id="projectNameInput"
+            v-model="inputProjectName"
+            type="text"
+            class="form-control"
+            :placeholder="projectName"
+          />
+        </div>
       </div>
-
-      <!-- Ошибка, если возникает другая проблема -->
-      <div v-if="error" class="error-message">
-        {{ error }}
-      </div>
-
-      <div class="button-group">
-        <button
-          @click="confirmDelete"
-          class="submit-button"
-          :disabled="!isConfirmNameValid || loading"
-        >
-          {{ loading ? 'Удаление...' : 'Удалить' }}
-        </button>
-        <button
-          @click="closeModal"
-          class="cancel-button"
-          :disabled="loading"
+      
+      <div class="modal-footer">
+        <button 
+          class="btn-cancel" 
+          @click="close"
         >
           Отмена
+        </button>
+        <button 
+          class="btn-confirm"
+          :disabled="!isConfirmed"
+          @click="confirm"
+        >
+          Удалить проект
         </button>
       </div>
     </div>
@@ -53,83 +45,41 @@
 </template>
 
 <script>
-import { ref, computed, watch } from 'vue';
-import { useProjectStore } from '@/stores/ProjectStore';
+import { ref, computed } from 'vue';
 
 export default {
-  name: 'DeleteProjectModal',
+  name: "DeleteProjectModal",
   props: {
-    projectId: {
-      type: Number,
-      required: true,
-    },
     projectName: {
       type: String,
-      required: true,
-    },
+      required: true
+    }
   },
+  emits: ["close", "confirm"],
   setup(props, { emit }) {
-    const projectStore = useProjectStore();
+    const inputProjectName = ref('');
 
-    const loading = ref(false);
-    const error = ref(null);
-    const confirmName = ref('');
-    const validationError = ref(null);
-
-    const isConfirmNameValid = computed(() => {
-      return confirmName.value.trim() === props.projectName;
+    const isConfirmed = computed(() => {
+      return inputProjectName.value.trim() === props.projectName;
     });
 
-    watch(confirmName, (newVal) => {
-      if (newVal === '') {
-        validationError.value = null;
-      } else if (!isConfirmNameValid.value) {
-        validationError.value = 'Введённое название не совпадает с названием проекта.';
-      } else {
-        validationError.value = null;
-      }
-    });
+    function close() {
+      emit('close');
+    }
 
-    const confirmDelete = async () => {
-      if (!isConfirmNameValid.value) {
-        validationError.value = 'Введённое название не совпадает с названием проекта.';
-        return;
+    function confirm() {
+      if (isConfirmed.value) {
+        emit('confirm');
       }
-
-      error.value = null;
-      loading.value = true;
-      try {
-        const result = await projectStore.deleteProject(props.projectId);
-        if (result) {
-          emit('deleted');
-          emit('close');
-        } else {
-          error.value = 'Не удалось удалить проект. Попробуйте ещё раз.';
-        }
-      } catch (err) {
-        console.error('DeleteProjectModal - confirmDelete error:', err);
-        error.value = err.message || 'Произошла ошибка при удалении проекта.';
-      } finally {
-        loading.value = false;
-      }
-    };
-
-    const closeModal = () => {
-      if (!loading.value) {
-        emit('close');
-      }
-    };
+    }
 
     return {
-      loading,
-      error,
-      confirmName,
-      validationError,
-      isConfirmNameValid,
-      confirmDelete,
-      closeModal,
+      inputProjectName,
+      isConfirmed,
+      close,
+      confirm
     };
-  },
+  }
 };
 </script>
 
@@ -138,125 +88,144 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(35, 0, 90, 0.5);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 2000;
+  justify-content: center;
+  z-index: 1000;
 }
 
 .modal-content {
-  background-color: #fff;
-  padding: 1.5rem 2rem;
+  background: white;
   border-radius: 12px;
-  width: 90%;
-  max-width: 500px;
-  box-sizing: border-box;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  -webkit-user-select: none; 
-  -moz-user-select: none;    
-  -ms-user-select: none;     
-  user-select: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 500px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modal-appear 0.3s ease-out;
 }
 
-.confirmation-group input,
-.confirmation-group input::placeholder,
-button {
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-h2 {
-  margin-bottom: 1rem;
-  text-align: center;
-  color: #dc3545;
-}
-
-.warning-text {
-  margin-bottom: 1rem;
-  color: #333;
-  text-align: center;
-}
-
-.confirmation-group {
-  margin-bottom: 1rem;
+.modal-header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
 }
 
-.confirmation-group label {
-  margin-bottom: 0.5rem;
+.modal-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.4rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #777;
+  transition: color 0.2s;
+}
+
+.modal-close:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-body p {
+  margin: 0 0 15px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.confirmation-input {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 20px;
+}
+
+.confirmation-input label {
+  display: block;
+  margin-bottom: 10px;
   font-weight: 500;
+  color: #8c0b0b;
 }
 
-.confirmation-group input {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
+.form-control {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 1rem;
+  transition: border-color 0.2s;
 }
 
-.char-count {
-  align-self: flex-end;
-  font-size: 0.875rem;
-  color: #666;
-  margin-top: 0.25rem;
+.form-control:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
-.error-message {
-  color: #dc3545;
-  margin-bottom: 1rem;
-  text-align: center;
-  font-weight: 500;
-}
-
-.button-group {
+.modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
+  padding: 20px;
+  border-top: 1px solid #eee;
+  gap: 10px;
 }
 
-.submit-button {
+.btn-cancel, .btn-confirm {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.btn-cancel:hover {
+  background-color: #e9e9e9;
+}
+
+.btn-confirm {
   background-color: #dc3545;
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.3s;
+  color: white;
+  border: 1px solid #dc3545;
 }
 
-.submit-button:hover {
+.btn-confirm:disabled {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn-confirm:not(:disabled):hover {
   background-color: #c82333;
-}
-
-.submit-button:disabled {
-  background-color: #f19696;
-  cursor: not-allowed;
-}
-
-.cancel-button {
-  background-color: #6c757d;
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.3s;
-}
-
-.cancel-button:hover {
-  background-color: #5a6268;
-}
-
-.cancel-button:disabled {
-  background-color: #bbb;
-  cursor: not-allowed;
+  border-color: #bd2130;
 }
 </style>
