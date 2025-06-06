@@ -79,14 +79,9 @@
             <td class="col-item">{{ itemObj.item }}</td>
             <td class="col-ref">
               <span v-if="itemObj.testCaseId">
-                <router-link
-                  :to="{
-                    name: 'TestCasePage',
-                    params: { projectId, testCaseId: itemObj.testCaseId }
-                  }"
-                >
+                <a href="#" @click.prevent="openInTab(itemObj.testCaseId)">
                   #{{ itemObj.testCaseId }} — {{ itemObj.item }}
-                </router-link>
+                </a>
               </span>
               <span v-else>—</span>
             </td>
@@ -169,6 +164,13 @@ function confirmDelete() {
   router.push({ name: "ProjectDetail", params: { projectId } });
 }
 
+function openInTab(testCaseId) {
+  const url = router.resolve({
+    name: 'TestCasePage',
+    params: { projectId, testCaseId }
+  }).href;
+  window.open(url, '_blank'); // без указания width/height браузер откроет вкладку
+}
 const orderedItems = computed(() => {
   return checkList.value?.items
     ? [...checkList.value.items].sort((a, b) => (a.number || 0) - (b.number || 0))
