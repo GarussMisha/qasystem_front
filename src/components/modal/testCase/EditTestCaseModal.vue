@@ -229,6 +229,8 @@ export default {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal-header {

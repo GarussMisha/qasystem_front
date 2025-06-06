@@ -145,11 +145,13 @@ export default {
   background: #fff;
   border-radius: 8px;
   width: 90%;
-  max-width: 500px;
+  max-width: 800px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal-header {
@@ -157,7 +159,6 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  background-color: #f5f5f5;
   border-bottom: 1px solid #eee;
 }
 
@@ -203,8 +204,6 @@ export default {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1rem;
-  color: #333;
-  box-sizing: border-box;
 }
 
 .form-group input:focus,
@@ -216,7 +215,6 @@ export default {
 .form-group textarea {
   resize: vertical;
   min-height: 80px;
-  max-height: 300px;
 }
 
 .char-count {

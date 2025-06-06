@@ -9,8 +9,8 @@
       <div class="modal-body">
         <p>
           Для подтверждения удаления введите название чек-листа:
-          <strong>"{{ checklistName }}"</strong>
         </p>
+        <strong>"{{ checklistName }}"</strong>
         <input
           v-model="confirmName"
           type="text"
@@ -94,10 +94,12 @@ export default {
   background: #fff;
   border-radius: 8px;
   width: 90%;
-  max-width: 400px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal-header {
@@ -129,7 +131,7 @@ export default {
 }
 
 .confirm-input {
-  width: 100%;
+  width: 90%;
   padding: 8px 12px;
   margin-top: 8px;
   border: 1px solid #ccc;

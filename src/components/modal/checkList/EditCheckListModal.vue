@@ -9,7 +9,7 @@
 
       <form @submit.prevent="submitForm" class="modal-form">
         <!-- Название чек-листа -->
-        <div class="form-group wide">
+        <div class="form-group">
           <label for="editCheckListName">Название чек-листа</label>
           <input
             id="editCheckListName"
@@ -23,7 +23,7 @@
         </div>
 
         <!-- Описание (необязательно) -->
-        <div class="form-group wide">
+        <div class="form-group">
           <label for="editCheckListDescription">Описание</label>
           <textarea
             id="editCheckListDescription"
@@ -290,10 +290,12 @@ export default {
   background: #fff;
   border-radius: 8px;
   width: 90%;
-  max-width: 600px;
+  max-width: 800px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal-header {
@@ -325,9 +327,9 @@ export default {
   gap: 16px;
 }
 
-.form-group.wide input,
-.form-group.wide textarea {
-  width: 100%;
+.form-group {
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group {

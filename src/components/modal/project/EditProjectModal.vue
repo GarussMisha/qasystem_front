@@ -150,7 +150,7 @@ export default {
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  width: 500px;
+  width: 800px;
   max-width: 90%;
   max-height: 90vh;
   overflow-y: auto;
