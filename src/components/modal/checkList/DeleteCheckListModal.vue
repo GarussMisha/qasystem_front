@@ -1,16 +1,16 @@
-<!-- File: src/components/modal/testCase/DeleteTestCaseModal.vue -->
+<!-- File: src/components/modal/checkList/DeleteCheckListModal.vue -->
 <template>
   <div class="modal-overlay" @mousedown.self="closeModal">
     <div class="modal-dialog" @click.stop>
       <header class="modal-header">
-        <h3>Удалить тест-кейс</h3>
+        <h3>Удалить чек-лист</h3>
         <button class="close-btn" @click="closeModal">&times;</button>
       </header>
       <div class="modal-body">
         <p>
-          Для подтверждения удаления введите точное имя тест-кейса:
+          Для подтверждения удаления введите название чек-листа:
         </p>
-        <strong>"{{ testcaseName }}"</strong>
+        <strong>"{{ checklistName }}"</strong>
         <input
           v-model="confirmName"
           type="text"
@@ -23,7 +23,7 @@
         <button
           class="btn danger"
           @click="confirmDelete"
-          :disabled="loading || confirmName !== testcaseName"
+          :disabled="loading || confirmName !== checklistName"
         >
           {{ loading ? "Удаление..." : "Удалить" }}
         </button>
@@ -34,16 +34,16 @@
 
 <script>
 import { ref } from "vue";
-import testCaseApi from "@/api/testCase.api.js";
+import checkListApi from "@/api/checkList.api.js";
 
 export default {
-  name: "DeleteTestCaseModal",
+  name: "DeleteCheckListModal",
   props: {
-    testcaseId: {
+    checklistId: {
       type: [Number, String],
       required: true
     },
-    testcaseName: {
+    checklistName: {
       type: String,
       required: true
     }
@@ -54,16 +54,16 @@ export default {
     const confirmName = ref("");
 
     const confirmDelete = async () => {
-      if (confirmName.value !== props.testcaseName) {
+      if (confirmName.value !== props.checklistName) {
         return;
       }
       loading.value = true;
       try {
-        await testCaseApi.deleteById(props.testcaseId);
+        await checkListApi.deleteById(props.checklistId);
         emit("confirmed");
       } catch (e) {
-        console.error("Ошибка при удалении тест-кейса:", e);
-        alert("Не удалось удалить тест-кейс.");
+        console.error("Ошибка при удалении чек-листа:", e);
+        alert("Не удалось удалить чек-лист");
       } finally {
         loading.value = false;
       }

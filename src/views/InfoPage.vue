@@ -1,28 +1,38 @@
 <template>
-  <header class="info-page">
-    <div class="info">
-      <h1>Добро пожаловать в QASystem</h1>
-      <p>
-        QASystem — это веб-приложение, предназначенное для организации и управления процессом тестирования программного обеспечения.
-        Оно позволяет автоматизировать рутинные задачи, централизованно управлять тест-кейсами, чек-листами и проектами, а также интегрироваться с другими инструментами разработки.
+  <div class="info-page">
+    <!-- Верхняя карточка с общим описанием -->
+    <section class="info-card">
+      <h1 class="info-title">Добро пожаловать в QASystem</h1>
+      <p class="info-text">
+        QASystem — это веб-приложение, предназначенное для организации и управления процессом тестирования
+        программного обеспечения. Оно позволяет автоматизировать рутинные задачи, централизованно управлять
+        тест-кейсами, чек-листами и проектами, а также интегрироваться с другими инструментами разработки.
       </p>
-    </div>
+    </section>
 
-    <div class="guide">
-      <h2>Компоненты и функционал:</h2>
-      <ul>
+    <!-- Карточка с руководством по функционалу -->
+    <section class="guide-card">
+      <h2 class="guide-title">Компоненты и функционал</h2>
+      <ul class="guide-list">
         <li>
-          <strong>Модуль ведения проектов:</strong> создание, редактирование и удаление проектов. Для примера Калькулятор может быть проектом. 
+          <span class="bullet">•</span>
+          <strong>Модуль ведения проектов:</strong>
+          создание, редактирование и удаление проектов. Например, «Калькулятор» может быть отдельным проектом.
         </li>
         <li>
-          <strong>Модуль тест-кейсов:</strong> управление тест-кейсами и его шагами, включая создание, редактирование и удаление. Для Калькулятора это может быть проверка сложения и другого функционала.
+          <span class="bullet">•</span>
+          <strong>Модуль тест-кейсов:</strong>
+          управление тест-кейса и его шагами, включая создание, редактирование и удаление. Для модуля «Калькулятор»
+          это может быть проверка операций сложения, вычитания и т. д.
         </li>
         <li>
-          <strong>Управляйте чек-листами:</strong> Добавляйте, редактируйте или удаляйте чек-листы для удобного планирования тестирования.
+          <span class="bullet">•</span>
+          <strong>Управление чек-листами:</strong>
+          добавление, редактирование и удаление чек-листов для удобного планирования процесса тестирования.
         </li>
       </ul>
-    </div>
-  </header>
+    </section>
+  </div>
 </template>
 
 <script>
@@ -32,82 +42,97 @@ export default {
 </script>
 
 <style scoped>
+/* Общий контейнер */
 .info-page {
-  max-width: 1200px;
+  max-width: 1024px;
   margin: 0 auto;
   padding: 20px;
+  box-sizing: border-box;
   font-family: 'Arial', sans-serif;
-  background-color: #ffffff;
+  background-color: #f9f9fb;
   color: #333;
 }
 
-.info {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-  margin-bottom: 20px;
-  padding: 20px;
+/* Карточка с описанием */
+.info-card {
   background-color: #292961;
-  color: white;
+  color: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
-.info h1 {
+.info-title {
   font-size: 24px;
   font-weight: bold;
+  margin: 0 0 12px;
+}
+
+.info-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #d0d0ff;
   margin: 0;
 }
 
-.info p {
-  font-size: 16px;
-  margin-top: 10px;
-  color: #d0d0ff;
-}
-
-.guide {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-  margin-bottom: 20px;
-  padding: 20px;
-  background-color: white;
-  color: #333;
+/* Карточка с руководством */
+.guide-card {
+  background-color: #ffffff;
+  color: #333333;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.guide h2 {
+.guide-title {
   font-size: 20px;
   font-weight: bold;
-  margin-bottom: 15px;
+  margin: 0 0 16px;
   color: #292961;
 }
 
-.guide ul {
-  list-style-type: none;
+.guide-list {
+  list-style: none;
+  margin: 0;
   padding: 0;
 }
 
-.guide li {
-  margin-bottom: 15px;
-  font-size: 14px;
-  line-height: 1.5;
+.guide-list li {
   position: relative;
-  padding-left: 20px;
+  padding-left: 24px;
+  margin-bottom: 14px;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
-.guide li::before {
-  content: '•';
+.guide-list li .bullet {
   position: absolute;
   left: 0;
+  top: 2px;
   color: #6200ea;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1;
 }
 
-.guide li strong {
+.guide-list li strong {
   font-weight: bold;
   color: #292961;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+  .info-card, .guide-card {
+    padding: 16px;
+  }
+  .info-title {
+    font-size: 20px;
+  }
+  .info-text, .guide-list li {
+    font-size: 14px;
+  }
+  .guide-title {
+    font-size: 18px;
+  }
 }
 </style>

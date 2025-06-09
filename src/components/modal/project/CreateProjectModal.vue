@@ -1,9 +1,15 @@
-<!-- CreateProjectModal.vue -->
+<!-- File: src/components/modal/project/CreateProjectModal.vue -->
 <template>
   <div class="modal-overlay" @mousedown.self="closeModal">
     <div class="modal-content" @click.stop>
-      <h2>Создать проект</h2>
-      <form @submit.prevent="submitForm">
+      <!-- Заголовок с кнопкой закрытия -->
+      <header class="modal-header">
+        <h2>Создать проект</h2>
+        <button class="close-btn" @click="closeModal">&times;</button>
+      </header>
+
+      <!-- Форма создания проекта -->
+      <form @submit.prevent="submitForm" class="modal-form">
         <!-- Название проекта -->
         <div class="form-group">
           <label for="projectName">Название проекта:</label>
@@ -15,7 +21,7 @@
             required
             placeholder="Введите название проекта"
           />
-          <span class="char-count">{{ name.length }}/64</span>
+          <small class="char-count">{{ name.length }}/64</small>
         </div>
 
         <!-- Описание проекта -->
@@ -27,25 +33,24 @@
             maxlength="255"
             required
             placeholder="Введите описание проекта"
+            @input="onTextareaInput"
             :style="{ height: textareaHeight + 'px' }"
           ></textarea>
-          <span class="char-count">{{ description.length }}/255</span>
+          <small class="char-count">{{ description.length }}/255</small>
         </div>
 
         <!-- Отображение ошибки -->
-        <div v-if="error" class="error-message">
-          {{ error }}
-        </div>
+        <p v-if="error" class="error-message">{{ error }}</p>
 
-        <!-- Кнопки -->
-        <div class="button-group">
-          <button type="submit" class="submit-button" :disabled="loading">
-            {{ loading ? 'Создание...' : 'Создать' }}
-          </button>
-          <button type="button" @click="closeModal" class="cancel-button" :disabled="loading">
+        <!-- Кнопки действий (футер) -->
+        <footer class="modal-footer">
+          <button type="button" class="btn secondary" @click="closeModal" :disabled="loading">
             Отмена
           </button>
-        </div>
+          <button type="submit" class="btn primary" :disabled="loading">
+            {{ loading ? 'Создание...' : 'Создать' }}
+          </button>
+        </footer>
       </form>
     </div>
   </div>
@@ -53,23 +58,21 @@
 
 <script>
 import { ref } from 'vue';
-import { useProjectStore } from '@/stores/ProjectStore';
+import { projectApi } from '@/api/index';
 
 export default {
   name: "CreateProjectModal",
+  emits: ["close", "project-created"],
   setup(props, { emit }) {
-    const projectStore = useProjectStore();
-
     const name = ref("");
     const description = ref("");
     const loading = ref(false);
     const error = ref(null);
-    const textareaHeight = ref(100);
+    const textareaHeight = ref(80);
 
     const submitForm = async () => {
-      //  валидация на уровне данных
       if (name.value.length > 64 || description.value.length > 255) {
-        error.value = "Название или описание проекта не могут превышать 64 и 255 символов соответственно.";
+        error.value = "Название не более 64 символов, описание не более 255.";
         return;
       }
 
@@ -77,16 +80,17 @@ export default {
       error.value = null;
 
       try {
-        const newProject = await projectStore.createNewProject({
-          name: name.value,
-          description: description.value,
+        const newProject = await projectApi.create({
+          projectName: name.value.trim(),
+          projectDescription: description.value.trim(),
         });
 
         if (newProject) {
           name.value = "";
           description.value = "";
-          textareaHeight.value = 100;
+          textareaHeight.value = 80;
           emit("close");
+          emit("project-created", newProject);
         } else {
           error.value = "Не удалось создать проект. Попробуйте ещё раз.";
         }
@@ -100,26 +104,26 @@ export default {
 
     const closeModal = () => {
       if (!loading.value) {
-        emit("close");
         name.value = "";
         description.value = "";
-        textareaHeight.value = 100;
+        textareaHeight.value = 80;
         error.value = null;
+        emit("close");
       }
     };
 
     const onTextareaInput = (event) => {
-      textareaHeight.value = event.target.scrollHeight;
+      textareaHeight.value = Math.max(80, event.target.scrollHeight);
     };
 
     return {
       name,
       description,
-      submitForm,
-      closeModal,
       loading,
       error,
       textareaHeight,
+      submitForm,
+      closeModal,
       onTextareaInput,
     };
   },
@@ -129,147 +133,166 @@ export default {
 <style scoped>
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(35, 0, 90, 0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
 }
 
 .modal-content {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 12px;
+  background: #fff;
+  border-radius: 8px;
   width: 90%;
-  max-width: 500px;
-  box-sizing: border-box;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  position: relative;
+  max-width: 800px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #888;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.modal-form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
   display: flex;
   flex-direction: column;
 }
 
-.modal-content h2 {
-  margin-bottom: 1.5rem;
-  color: #23005a;
-  text-align: center;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-  width: 100%;
-}
-
 .form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #333;
   font-weight: 500;
+  margin-bottom: 4px;
+  color: #444;
 }
 
 .form-group input,
 .form-group textarea {
-  width: 100%;
-  max-width: 100%;
-  padding: 0.75rem;
+  padding: 8px 12px;
   border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-  color: #333;
+  border-radius: 4px;
   font-size: 1rem;
-  resize: vertical;
-  overflow: hidden;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
-  border-color: #23005a;
+  border-color: #007bff;
   outline: none;
 }
 
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
 .char-count {
-  font-size: 0.85rem;
-  color: #6c757d;
-  margin-top: 0.25rem;
-  display: block;
-  text-align: right;
-}
-
-.button-group {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-}
-
-.submit-button {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.3s;
-}
-
-.submit-button:hover {
-  background-color: #218838;
-}
-
-.submit-button:disabled {
-  background-color: #94d3a2;
-  cursor: not-allowed;
-}
-
-.cancel-button {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.3s;
-}
-
-.cancel-button:hover {
-  background-color: #c82333;
-}
-
-.cancel-button:disabled {
-  background-color: #e99a9f;
-  cursor: not-allowed;
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 4px;
+  align-self: flex-end;
 }
 
 .error-message {
   color: #dc3545;
-  margin-bottom: 1rem;
+  font-size: 0.9rem;
   text-align: center;
-  font-weight: 500;
+  margin-bottom: 0;
 }
 
-.form-group textarea {
-  max-width: 100%;
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #eee;
+}
+
+.btn {
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  min-width: 100px;
   box-sizing: border-box;
 }
 
+.primary {
+  background-color: #28a745;
+  color: #fff;
+  font-weight: 500;
+}
+
+.primary:hover {
+  background-color: #218838;
+}
+
+.primary:disabled {
+  background-color: #94d3a2;
+  cursor: not-allowed;
+}
+
+.secondary {
+  background-color: #dc3545;
+  color: #fff;
+  font-weight: 500;
+}
+
+.secondary:hover {
+  background-color: #c82333;
+}
+
+.secondary:disabled {
+  background-color: #e99a9f;
+  cursor: not-allowed;
+}
+
+/* Адаптивные правки */
 @media (max-width: 600px) {
   .modal-content {
-    padding: 1.5rem;
+    width: 95%;
   }
-
-  .button-group {
-    flex-direction: column;
-    align-items: stretch;
+  .modal-form {
+    padding: 16px;
   }
-
-  .submit-button,
-  .cancel-button {
-    width: 100%;
+  .modal-header,
+  .modal-footer {
+    padding: 12px 16px;
+  }
+  .btn {
+    flex: 1;
   }
 }
 </style>

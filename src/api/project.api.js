@@ -13,6 +13,7 @@ export default {
      *      "id": 56,
      *      "projectName": "Телефон",
      *      "projectDescription": "Тестирование функций телефона",
+     *      "projectStatus": "ACTIVE",
      *      "testCases": [64, 65],
      *      "dateOfCreated": "2025-01-08T16:17:29.264106"
      *  },
@@ -39,6 +40,7 @@ export default {
      *     "id": 58,
      *     "projectName": "Первый проект",
      *     "projectDescription": "Описание первого проекта",
+     *     "projectStatus": "ACTIVE",
      *     "testCases": [],
      *     "dateOfCreated": "2025-01-08T17:02:56.894615"
      * } 
@@ -67,6 +69,7 @@ export default {
      *     "id": 58,
      *     "projectName": "Первый проект",
      *     "projectDescription": "Описание первого проекта",
+     *     "projectStatus": "ACTIVE",
      *     "testCases": [],
      *     "dateOfCreated": "2025-01-08T17:02:56.8946154"
      * }
@@ -93,6 +96,7 @@ export default {
      *     "id": 56,
      *     "projectName": "Телефон",
      *     "projectDescription": "Тестирование функций телефона",
+     *     "projectStatus": "ACTIVE",
      *     "testCases": [64, 65],
      *     "dateOfCreated": "2025-01-08T16:17:29.264106"
      * }
@@ -121,6 +125,7 @@ export default {
      *     "id": 58,
      *     "projectName": "Первый проект отредактирован",
      *     "projectDescription": "Описание первого проекта отредактировано",
+     *     "projectStatus": "ACTIVE",
      *     "testCases": [],
      *     "dateOfCreated": "2025-01-08T17:02:56.894615"
      * }

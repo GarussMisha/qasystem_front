@@ -1,23 +1,23 @@
 <template>
   <div id="app">
-    <HeadBar />
     <SideMenu @toggle="handleSideMenuToggle" />
     <div class="content" :style="{ marginLeft: contentMargiLeft }">
-      <PathBar />
+      <div class="path-bar-wrapper">
+        <PathBar />
+      </div>
       <router-view />
     </div>
   </div>
 </template>
 
+
 <script>
-import HeadBar from '@/components/HeadBar.vue';
 import SideMenu from '@/components/SideMenu.vue';
 import PathBar from '@/components/PathBar.vue';
 
 export default {
   name: 'App',
   components: {
-    HeadBar,
     SideMenu,
     PathBar,
   },
@@ -28,7 +28,7 @@ export default {
   },
   computed: {
     contentMargiLeft() {
-      return this.isSideMenuExpanded ? '200px' : '40px';
+      return this.isSideMenuExpanded ? '200px' : '50px';
     }
   },
   methods: {
@@ -50,9 +50,15 @@ body, html {
   height: 100%; /* Убедимся, что html и body занимают всю высоту */
 }
 
-:root {
-  --header-height: 60px;
+.path-bar-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: #f5f5f5;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
+
+
 
 #app {
   font-family: 'Roboto', sans-serif;
@@ -62,7 +68,30 @@ body, html {
 }
 
 .content {
-  transition: margin-left 0.5s ease;
+  transition: margin-left 0.4s ease;
   padding-top: var(--header-height);
+}
+
+::-webkit-scrollbar {
+  width: 8px;               /* ширина полосы */
+  background-color: transparent; /* цвет фона за полосой */
+}
+
+/* Фон «дорожки» (track) */
+::-webkit-scrollbar-track {
+  background: #d8d8d8e2;      /* светлый фон дорожки */
+  border-radius: 4px;
+}
+
+/* Сам «ползунок» (thumb) */
+::-webkit-scrollbar-thumb {
+  background-color: #b9b2f8ec; /* цвет ползунка */
+  border-radius: 22px;        /* скруглённые углы */
+  border: 4px solid transparent; /* добавляем небольшую «рамку» */
+}
+
+/* При наведении на ползунок */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #a19ae0ec; /* чуть темнее при hover */
 }
 </style>

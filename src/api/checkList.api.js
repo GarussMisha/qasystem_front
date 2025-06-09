@@ -57,6 +57,46 @@ export default {
     /**
      * 4. Создать Чек-лист в конкретном проекте 
      * POST http://localhost:9090/project/{projectId}/checklist
+     * 
+     * Принимает:
+     * {
+            "checkListName" : "Первый чек-лист",
+            "checkListDescription" : "Описание первого листа",
+            "items" : [
+                {
+                    "item" : "Проверка сложения",
+                    "testCaseId" : 1
+
+                },
+                {
+                    "item" : "Проверка вычитания"
+                }
+            ]
+            
+        }
+     * Возвращает:
+     * {
+            "id": 1,
+            "checkListName": "Первый чек-лист",
+            "checkListDescription": "Описание первого листа",
+            "project": 2,
+            "dateOfCreated": "2025-05-28T11:26:23.310037",
+            "items": [
+                {
+                    "id": 1,
+                    "number": 1,
+                    "testCaseId": 1,
+                    "item": "Проверка сложения"
+                },
+                {
+                    "id": 2,
+                    "number": 2,
+                    "testCaseId": null,
+                    "item": "Проверка вычитания"
+                }
+            ]
+        }
+     *
      */
     async create(projectId, checkListData){
         try{
@@ -94,7 +134,7 @@ export default {
             console.log(response.data);
             return response.data;
         } catch (error){
-            const customError = new Error(`Error -> checkList.api.deleteById(): ${error.message}, testCaseId = ${testCaseId}`);
+            const customError = new Error(`Error -> checkList.api.deleteById(): ${error.message}, testCaseId = ${checklistId}`);
             console.error(customError);
             throw customError;
         }

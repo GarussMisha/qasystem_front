@@ -1,88 +1,69 @@
-<!-- CreateTestCaseModal.vue -->
 <template>
   <div class="modal-overlay" @mousedown.self="closeModal">
     <div class="modal-content" @click.stop>
-      <h2>Создать тест-кейс</h2>
-      <form @submit.prevent="submitForm">
-        <!-- Название тест-кейса -->
+      <header class="modal-header">
+        <h2>Создать тест-кейс</h2>
+        <button class="close-btn" @click="closeModal">&times;</button>
+      </header>
+      <form @submit.prevent="submitForm" class="modal-form">
         <div class="form-group">
-          <label for="testcaseName">Название тест-кейса:</label>
+          <label for="testcaseName">Название тест-кейса</label>
           <input
             id="testcaseName"
             v-model="name"
             type="text"
             maxlength="64"
             required
-            placeholder="Введите название тест-кейса"
+            placeholder="Введите название"
           />
-          <span class="char-count">{{ name.length }}/64</span>
+          <small class="char-count">{{ name.length }}/64</small>
         </div>
 
-        <!-- Описание тест-кейса -->
         <div class="form-group">
-          <label for="testcaseDescription">Описание тест-кейса:</label>
+          <label for="testcaseDescription">Описание</label>
           <textarea
             id="testcaseDescription"
             v-model="description"
             maxlength="255"
-            placeholder="Введите описание тест-кейса (необязательно)"
+            placeholder="Опишите тест-кейс"
           ></textarea>
-          <span class="char-count">{{ description.length }}/255</span>
+          <small class="char-count">{{ description.length }}/255</small>
         </div>
 
-        <!-- Шаги тест-кейса (опционально) -->
-        <div class="steps-group">
-          <label>Шаги (необязательно):</label>
-          <div
-            v-for="(step, index) in steps"
-            :key="index"
-            class="step-item"
-          >
-            <input
-              v-model="step.step"
-              type="text"
-              placeholder="Название шага / Действие"
-              required
-            />
-            <input
-              v-model="step.resultStep"
-              type="text"
-              placeholder="Ожидаемый результат"
-              required
-            />
-            <button
-              type="button"
-              class="remove-step"
-              @click="removeStep(index)"
-              :disabled="loading"
-            >
-              &times;
-            </button>
+        <section class="steps-section">
+          <div class="steps-header">
+            <span>Шаги (необязательно)</span>
+            <button type="button" class="add-step-global" @click="addStep" :disabled="loading">+ Добавить шаг</button>
           </div>
-          <button
-            type="button"
-            class="add-step"
-            @click="addStep"
-            :disabled="loading"
+          <!-- Шаги: drag-and-drop -->
+          <div
+            v-for="(step, idx) in steps"
+            :key="idx"
+            class="step-wrapper"
+            @dragover.prevent
+            @drop="onDrop(idx)"
           >
-            + Добавить шаг
-          </button>
-        </div>
+            <div
+              class="step-item"
+              :class="{ dragging: dragIndex === idx }"
+              draggable="true"
+              @dragstart="onDragStart(idx)"
+              @dragend="onDragEnd"
+            >
+              <span class="step-number">{{ idx + 1 }}.</span>
+              <input v-model="step.step" type="text" placeholder="Действие" required />
+              <input v-model="step.resultStep" type="text" placeholder="Ожидаемый результат" required />
+              <button type="button" class="remove-step" @click="removeStep(idx)" :disabled="loading">&times;</button>
+            </div>
+          </div>
+        </section>
 
-        <!-- Отображение ошибки -->
-        <div v-if="error" class="error-message">
-          {{ error }}
-        </div>
+        <p v-if="error" class="error-message">{{ error }}</p>
 
-        <!-- Кнопки -->
-        <div class="button-group">
-          <button type="submit" class="submit-button" :disabled="loading">
-            {{ loading ? 'Создание...' : 'Создать' }}
-          </button>
-          <button type="button" @click="closeModal" class="cancel-button" :disabled="loading">
-            Отмена
-          </button>
-        </div>
+        <footer class="modal-footer">
+          <button type="button" class="btn secondary" @click="closeModal" :disabled="loading">Отмена</button>
+          <button type="submit" class="btn primary" :disabled="loading">{{ loading ? 'Создание...' : 'Создать' }}</button>
+        </footer>
       </form>
     </div>
   </div>
@@ -90,94 +71,76 @@
 
 <script>
 import { ref } from 'vue';
-import { useProjectDataStore } from '@/stores/ProjectDataStore';
+import testCaseApi from '@/api/testCase.api';
 
 export default {
   name: 'CreateTestCaseModal',
   props: {
-    projectId: {
-      type: Number,
-      required: true,
-    },
+    projectId: { type: Number, required: true }
   },
   setup(props, { emit }) {
-    const projectDataStore = useProjectDataStore();
-
     const name = ref('');
     const description = ref('');
     const steps = ref([]);
-
     const loading = ref(false);
     const error = ref(null);
+    const dragIndex = ref(null);
+
+    const onDragStart = idx => {
+      dragIndex.value = idx;
+    };
+    const onDragEnd = () => {
+      dragIndex.value = null;
+    };
+    const onDrop = idx => {
+      if (dragIndex.value === null || dragIndex.value === idx) return;
+      const moved = steps.value.splice(dragIndex.value, 1)[0];
+      const insertPos = dragIndex.value < idx ? idx : idx;
+      steps.value.splice(insertPos, 0, moved);
+      dragIndex.value = null;
+    };
 
     const submitForm = async () => {
-      if (name.value.trim() === '') {
-        error.value = 'Название тест-кейса обязательно.';
-        return;
-      }
-
-      if (name.value.length > 64 || description.value.length > 255) {
-        error.value = 'Название или описание тест-кейса превышает допустимую длину.';
-        return;
-      }
-
-      for (const [index, step] of steps.value.entries()) {
-        if (step.step.trim() === '' || step.resultStep.trim() === '') {
-          error.value = `Шаг ${index + 1} должен содержать название и ожидаемый результат.`;
-          return;
+      if (!name.value.trim()) { error.value = 'Введите название'; return; }
+      if (name.value.length > 64 || description.value.length > 255) { error.value = 'Превышена длина'; return; }
+      for (let i = 0; i < steps.value.length; i++) {
+        if (!steps.value[i].step.trim() || !steps.value[i].resultStep.trim()) {
+          error.value = `Шаг ${i + 1} должен быть заполнен`; return;
         }
       }
-
-      loading.value = true;
-      error.value = null;
-
+      loading.value = true; error.value = null;
       try {
-        const testCaseData = {
-          name: name.value.trim(),
-          description: description.value.trim(),
-          steps: steps.value.map((step) => ({
-            step: step.step.trim(),
-            resultStep: step.resultStep.trim(),
-          })),
+        const payload = {
+          testcaseName: name.value.trim(),
+          testcaseDescription: description.value.trim(),
+          steps: steps.value
         };
-
-        const newTestCase = await projectDataStore.createTestCase(props.projectId, testCaseData);
-
-        if (newTestCase) {
-          emit('testcase-created', newTestCase);
-          emit('close');
-          resetForm();
-        } else {
-          error.value = 'Не удалось создать тест-кейс. Попробуйте ещё раз.';
-        }
-      } catch (err) {
-        console.error('CreateTestCaseModal - submitForm error:', err);
-        error.value = err.message || 'Произошла ошибка при создании тест-кейса.';
-      } finally {
-        loading.value = false;
-      }
+        const newCase = await testCaseApi.create(props.projectId, payload);
+        emit('testcase-created', newCase);
+        emit('close');
+        reset();
+      } catch (e) { error.value = e.message || 'Ошибка создания'; }
+      finally { loading.value = false; }
     };
 
     const closeModal = () => {
       if (!loading.value) {
         emit('close');
-        resetForm();
+        reset();
       }
     };
-
-    const resetForm = () => {
+    const reset = () => {
       name.value = '';
       description.value = '';
       steps.value = [];
       error.value = null;
+      dragIndex.value = null;
     };
-
     const addStep = () => {
       steps.value.push({ step: '', resultStep: '' });
     };
-
-    const removeStep = (index) => {
-      steps.value.splice(index, 1);
+    const removeStep = i => {
+      steps.value.splice(i, 1);
     };
 
     return {
@@ -190,165 +153,201 @@ export default {
       closeModal,
       addStep,
       removeStep,
+      onDragStart,
+      onDragEnd,
+      onDrop,
+      dragIndex
     };
-  },
+  }
 };
 </script>
 
 <style scoped>
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(35, 0, 90, 0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 2000;
+  justify-content: center;
+  z-index: 1000;
 }
 
 .modal-content {
-  background-color: #fff;
-  padding: 2rem;
-  border-radius: 12px;
+  background: #fff;
+  border-radius: 8px;
   width: 90%;
-  max-width: 600px;
-  box-sizing: border-box;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 800px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
-h2 {
-  margin-bottom: 1.5rem;
-  text-align: center;
-  color: #23005a;
+
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #888;
+}
+
+.modal-form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #333;
   font-weight: 500;
+  margin-bottom: 4px;
+  color: #444;
 }
 
 .form-group input,
 .form-group textarea {
-  width: 100%;
-  padding: 0.75rem;
+  padding: 8px 12px;
   border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-  color: #333;
+  border-radius: 4px;
   font-size: 1rem;
+}
+
+.form-group textarea {
   resize: vertical;
-  margin-bottom: 0.5rem;
+  min-height: 80px;
 }
 
 .char-count {
-  font-size: 0.85rem;
-  color: #6c757d;
-  margin-top: -0.25rem;
-  margin-bottom: 1rem;
-  display: block;
-  text-align: right;
+  align-self: flex-end;
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 4px;
 }
 
-.steps-group {
-  margin-bottom: 1.5rem;
+.steps-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.steps-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-step-global {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.step-wrapper {
+  position: relative;
+}
+
+.step-wrapper + .step-wrapper {
+  margin-top: 8px;
 }
 
 .step-item {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fafafa;
+  cursor: grab;
+}
+
+.step-item.dragging {
+  opacity: 0.6;
+  background: #e0e0ff;
+}
+
+.step-number {
+  width: 24px;
+  text-align: right;
+  color: #666;
 }
 
 .step-item input {
   flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
 }
 
 .remove-step {
-  background-color: #dc3545;
-  color: #fff;
+  background: none;
   border: none;
-  padding: 0.5rem;
-  border-radius: 4px;
+  font-size: 1.2rem;
+  color: #d9534f;
   cursor: pointer;
-}
-
-.remove-step:hover {
-  background-color: #c82333;
-}
-
-.add-step {
-  background-color: #6c757d;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-}
-
-.add-step:hover {
-  background-color: #5a6268;
 }
 
 .error-message {
-  color: #dc3545;
-  margin-bottom: 1rem;
+  color: #d9534f;
+  font-size: 0.875rem;
   text-align: center;
-  font-weight: 500;
 }
 
-.button-group {
+.modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
+  gap: 12px;
+  padding: 8px 24px;
+  border-top: 1px solid #eee;
 }
 
-.submit-button {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+.btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.95rem;
   cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.3s;
-}
-
-.submit-button:hover {
-  background-color: #218838;
-}
-
-.submit-button:disabled {
-  background-color: #94d3a2;
-  cursor: not-allowed;
-}
-
-.cancel-button {
-  background-color: #dc3545;
-  color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.3s;
 }
 
-.cancel-button:hover {
-  background-color: #c82333;
+.primary {
+  background: #007bff;
+  color: #fff;
 }
 
-.cancel-button:disabled {
-  background-color: #e99a9f;
+.secondary {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.primary:disabled,
+.secondary:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 </style>

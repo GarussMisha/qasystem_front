@@ -1,21 +1,27 @@
-<!-- EditProjectModal.vue -->
+<!-- File: src/components/modal/project/EditProjectModal.vue -->
 <template>
   <div class="modal-overlay" @mousedown.self="closeModal">
     <div class="modal-content" @click.stop>
-      <h2>Редактировать проект</h2>
-      <form @submit.prevent="submitForm">
+      <!-- Заголовок с кнопкой закрытия -->
+      <header class="modal-header">
+        <h2>Редактировать проект</h2>
+        <button class="close-btn" @click="closeModal">&times;</button>
+      </header>
+
+      <!-- Форма редактирования проекта -->
+      <form @submit.prevent="submitForm" class="modal-form">
         <!-- Название проекта -->
         <div class="form-group">
           <label for="projectName">Название проекта:</label>
           <input
             id="projectName"
-            v-model="editedName"
+            v-model="name"
             type="text"
             maxlength="64"
             required
-            placeholder="Введите новое название проекта"
+            placeholder="Введите название проекта"
           />
-          <span class="char-count">{{ editedName.length }}/64</span>
+          <small class="char-count">{{ name.length }}/64</small>
         </div>
 
         <!-- Описание проекта -->
@@ -23,28 +29,28 @@
           <label for="projectDescription">Описание проекта:</label>
           <textarea
             id="projectDescription"
-            v-model="editedDescription"
+            v-model="description"
             maxlength="255"
             required
-            placeholder="Введите новое описание проекта"
+            placeholder="Введите описание проекта"
+            @input="onTextareaInput"
+            :style="{ height: textareaHeight + 'px' }"
           ></textarea>
-          <span class="char-count">{{ editedDescription.length }}/255</span>
+          <small class="char-count">{{ description.length }}/255</small>
         </div>
 
         <!-- Отображение ошибки -->
-        <div v-if="error" class="error-message">
-          {{ error }}
-        </div>
+        <p v-if="error" class="error-message">{{ error }}</p>
 
-        <!-- Кнопки -->
-        <div class="button-group">
-          <button type="submit" class="submit-button" :disabled="loading">
-            {{ loading ? 'Сохранение...' : 'Сохранить' }}
-          </button>
-          <button type="button" @click="closeModal" class="cancel-button" :disabled="loading">
+        <!-- Кнопки действий (футер) -->
+        <footer class="modal-footer">
+          <button type="button" class="btn secondary" @click="closeModal" :disabled="loading">
             Отмена
           </button>
-        </div>
+          <button type="submit" class="btn primary" :disabled="loading">
+            {{ loading ? 'Сохранение...' : 'Сохранить' }}
+          </button>
+        </footer>
       </form>
     </div>
   </div>
@@ -52,54 +58,48 @@
 
 <script>
 import { ref } from 'vue';
-import { useProjectStore } from '@/stores/ProjectStore';
+import { projectApi } from '@/api/index';
 
 export default {
-  name: 'EditProjectModal',
+  name: "EditProjectModal",
   props: {
-    projectId: {
-      type: Number,
-      required: true,
-    },
-    currentName: {
-      type: String,
-      default: '',
-    },
-    currentDescription: {
-      type: String,
-      default: '',
-    },
+    project: {
+      type: Object,
+      required: true
+    }
   },
+  emits: ["close", "project-updated"],
   setup(props, { emit }) {
-    const projectStore = useProjectStore();
-
-    const editedName = ref(props.currentName);
-    const editedDescription = ref(props.currentDescription);
+    const name = ref(props.project.projectName);
+    const description = ref(props.project.projectDescription);
     const loading = ref(false);
     const error = ref(null);
+    const textareaHeight = ref(80);
 
     const submitForm = async () => {
-      if (editedName.value.length > 64 || editedDescription.value.length > 255) {
-        error.value = 'Название или описание проекта превышает максимально допустимую длину.';
+      if (name.value.length > 64 || description.value.length > 255) {
+        error.value = "Название не более 64 символов, описание не более 255.";
         return;
       }
+
       loading.value = true;
       error.value = null;
 
       try {
-        const updatedProject = await projectStore.updateProject(props.projectId, {
-          projectName: editedName.value,
-          projectDescription: editedDescription.value,
+        const updatedProject = await projectApi.changeById(props.project.id, {
+          projectName: name.value.trim(),
+          projectDescription: description.value.trim()
         });
+
         if (updatedProject) {
-          emit('edited', updatedProject);
-          emit('close');
+          emit("close");
+          emit("project-updated", updatedProject);
         } else {
-          error.value = 'Не удалось сохранить изменения. Попробуйте ещё раз.';
+          error.value = "Не удалось обновить проект. Попробуйте ещё раз.";
         }
       } catch (err) {
-        error.value = err.message || 'Произошла ошибка при редактировании проекта.';
-        console.error('EditProjectModal - submitForm error:', err);
+        error.value = err.message || "Произошла ошибка при обновлении проекта.";
+        console.error("EditProjectModal - submitForm error:", err);
       } finally {
         loading.value = false;
       }
@@ -107,19 +107,28 @@ export default {
 
     const closeModal = () => {
       if (!loading.value) {
-        emit('close');
+        name.value = props.project.projectName;
+        description.value = props.project.projectDescription;
+        error.value = null;
+        emit("close");
       }
     };
 
+    const onTextareaInput = (event) => {
+      textareaHeight.value = Math.max(80, event.target.scrollHeight);
+    };
+
     return {
-      editedName,
-      editedDescription,
+      name,
+      description,
       loading,
       error,
+      textareaHeight,
       submitForm,
       closeModal,
+      onTextareaInput
     };
-  },
+  }
 };
 </script>
 
@@ -128,113 +137,155 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(35, 0, 90, 0.5);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 2000;
+  justify-content: center;
+  z-index: 1000;
 }
 
 .modal-content {
-  background-color: #fff;
-  padding: 1.5rem 2rem;
+  background: white;
   border-radius: 12px;
-  width: 90%;
-  max-width: 500px;
-  box-sizing: border-box;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 800px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modal-appear 0.3s ease-out;
 }
 
-h2 {
-  margin-bottom: 1rem;
-  text-align: center;
-  color: #23005a;
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.4rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #777;
+  transition: color 0.2s;
+}
+.close-btn:hover {
+  color: #333;
+}
+
+.modal-form {
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 20px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
-  color: #333;
+  margin-bottom: 8px;
   font-weight: 500;
+  color: #333;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
   border-radius: 6px;
-  box-sizing: border-box;
-  color: #333;
   font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.form-group textarea {
   resize: vertical;
+  min-height: 80px;
+  max-width: 100%;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
 .char-count {
-  font-size: 0.85rem;
-  color: #6c757d;
-  margin-top: -0.25rem;
-  margin-bottom: 1rem;
   display: block;
   text-align: right;
+  color: #777;
+  font-size: 0.85rem;
+  margin-top: 4px;
 }
 
 .error-message {
   color: #dc3545;
-  margin-bottom: 1rem;
-  text-align: center;
-  font-weight: 500;
+  margin: 0 0 15px;
 }
 
-.button-group {
+.modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
+  padding: 20px 0 0;
+  gap: 10px;
 }
 
-.submit-button {
-  background-color: #6f42c1; 
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.2rem;
+.btn {
+  padding: 10px 20px;
   border-radius: 6px;
+  font-size: 1rem;
   cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.3s;
+  transition: all 0.2s;
 }
 
-.submit-button:hover {
-  background-color: #5a32a3; 
+.btn.secondary {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
 }
 
-.submit-button:disabled {
-  background-color: #9a7dbf;
-  cursor: not-allowed;
+.btn.secondary:hover {
+  background-color: #e9e9e9;
 }
 
-.cancel-button {
-  background-color: #6c757d;
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.3s;
+.btn.primary {
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #007bff;
 }
 
-.cancel-button:hover {
-  background-color: #5a6268;
+.btn.primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
 }
 
-.cancel-button:disabled {
-  background-color: #bbb;
+.btn:disabled {
+  opacity: 0.7;
   cursor: not-allowed;
 }
 </style>
